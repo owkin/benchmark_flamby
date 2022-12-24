@@ -6,10 +6,12 @@ from benchopt import BaseDataset, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import numpy as np
-    from flamby.fed_tcga_brca import FedTcgaBrca as FedDataset
-    from flamby.fed_tcga_brca import metric, NUM_CLIENTS, Baseline, BaselineLoss
+    from flamby.datasets.fed_tcga_brca import FedTcgaBrca as FedDataset
+    from flamby.datasets.fed_tcga_brca import metric, NUM_CLIENTS, Baseline, BaselineLoss
+    from flamby.benchmarks.benchmark_utils import set_seed
     from torch.utils.data import Subset
     from sklearn.model_selection import train_test_split
+    
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`
@@ -22,7 +24,7 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     # Any parameters 'param' defined here is available as `self.param`.
     parameters = {
-        'test': ["val", "test"]
+        'test': ["val", "test"],
         'seed': [42],
     }
 
@@ -40,11 +42,12 @@ class Dataset(BaseDataset):
 
         if self.test == "val":
             # This part may vary across datasets specifically for label/RAM issues here we separate for each client a validation
-            # set while stratifying wrt the label
-            self.trainval_indices_list = [train_test_split(range(size), stratify=[el[i] for i in e[:size]], random_state=self.seed) for size, e in zip(self.trainval_datasets, self.trainval_sizes)]
+            # set while stratifying wrt the target variable, in this case censorship
+            self.trainval_indices_list = [train_test_split(range(size), stratify=[float(e[i][1][0]) for i in range(size)], random_state=self.seed) for e, size in zip(self.trainval_datasets, self.trainval_sizes)]
             self.train_datasets = [Subset(e, trainval_indices[0]) for e, trainval_indices in zip(self.trainval_datasets, self.trainval_indices_list)]
             self.val_datasets = [Subset(e, trainval_indices[1]) for e, trainval_indices in zip(self.trainval_datasets, self.trainval_indices_list)]
             self.test_datasets = self.val_datasets
+
         elif self.test == "test":
             pass
         else:

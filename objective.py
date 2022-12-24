@@ -6,7 +6,8 @@ from benchopt import BaseObjective, safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     #from flamby.strategies import FedAveraging, FedProx, Scaffold, FedAdam
-    from flamby.utils import set_seed, evaluate_model_on_tests
+    from flamby.benchmarks.benchmark_utils import set_seed
+    from flamby.utils import evaluate_model_on_tests
     from torch.utils.data import DataLoader
 
 
