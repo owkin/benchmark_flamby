@@ -53,7 +53,8 @@ class Dataset(BaseDataset):
             self.test_datasets = self.val_datasets
 
         elif self.test == "test":
-            pass
+            self.train_datasets = self.trainval_datasets
+            self.val_datasets = None
         else:
             raise ValueError()
 
@@ -61,4 +62,4 @@ class Dataset(BaseDataset):
         # same for loss and model
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
-        return dict(train_datasets=self.train_datasets, val_datasets=self.val_datasets, test_datasets=self.test_datasets, model_arch=Baseline, metric=metric, loss=BaselineLoss, batch_size_test=self.batch_size_test)
+        return dict(train_datasets=self.train_datasets, val_datasets=self.val_datasets, test_datasets=self.test_datasets, model_arch=Baseline, metric=metric, loss=BaselineLoss(), num_clients=self.num_clients, batch_size_test=self.batch_size_test)

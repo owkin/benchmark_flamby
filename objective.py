@@ -25,11 +25,11 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3"
 
-    def set_data(self, train_datasets, val_datasets, test_datasets, model_arch, metric, loss, batch_size_test):
+    def set_data(self, train_datasets, val_datasets, test_datasets, model_arch, metric, loss, num_clients, batch_size_test):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
-        self.train_datasets, self.val_datasets, self.test_datasets, self.model_arch, self.metric, self.loss, self.batch_size_test = train_datasets, val_datasets, test_datasets, model_arch, metric, loss, batch_size_test
+        self.train_datasets, self.val_datasets, self.test_datasets, self.model_arch, self.metric, self.loss, self.num_clients, self.batch_size_test = train_datasets, val_datasets, test_datasets, model_arch, metric, loss, num_clients, batch_size_test
         # We init the model
         set_seed(self.seed)
         self.model = self.model_arch()
@@ -52,7 +52,7 @@ class Objective(BaseObjective):
         for train_d, test_d in zip(self.train_datasets, self.test_datasets):
             single_client_train_loss = 0.
             count_batch = 0
-            for X, y in dl(train_d, batch_size=self.batch_size, shuffle=False):
+            for X, y in dl(train_d, batch_size=self.batch_size_test, shuffle=False):
                 single_client_train_loss += self.loss(model(X), y)
                 count_batch += 1
             single_client_train_loss /= float(count_batch)
@@ -60,7 +60,7 @@ class Objective(BaseObjective):
 
             single_client_test_loss = 0.
             count_batch = 0
-            for X, y in dl(test_d, batch_size=self.batch_size, shuffle=False):
+            for X, y in dl(test_d, batch_size=self.batch_size_test, shuffle=False):
                 single_client_test_loss += self.loss(model(X), y)
                 count_batch += 1
             single_client_test_loss /= float(count_batch)
