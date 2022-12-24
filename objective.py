@@ -17,8 +17,8 @@ class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
     name = "FLamby Average Metric across client"
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.seed = 42
 
     # Minimal version of benchopt required to run this benchmark.

@@ -27,8 +27,8 @@ class Dataset(BaseDataset):
         'test': ["val", "test"],
         'seed': [42],
     }
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # We choose to define the test batch-size in the dataset as it is heavily dataset dependent
         self.batch_size_test = 32
 
