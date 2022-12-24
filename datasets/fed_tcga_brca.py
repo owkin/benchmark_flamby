@@ -30,7 +30,7 @@ class Dataset(BaseDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # We choose to define the test batch-size in the dataset as it is heavily dataset dependent
-        self.batch_size_test = 32
+        self.batch_size_test = 1000
 
     def get_data(self):
         # The return arguments of this function are passed as keyword arguments

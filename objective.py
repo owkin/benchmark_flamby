@@ -53,7 +53,7 @@ class Objective(BaseObjective):
             single_client_train_loss = 0.
             count_batch = 0
             for X, y in dl(train_d, batch_size=self.batch_size_test, shuffle=False):
-                single_client_train_loss += self.loss(model(X), y)
+                single_client_train_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_train_loss /= float(count_batch)
             average_train_loss += single_client_train_loss
@@ -61,7 +61,7 @@ class Objective(BaseObjective):
             single_client_test_loss = 0.
             count_batch = 0
             for X, y in dl(test_d, batch_size=self.batch_size_test, shuffle=False):
-                single_client_test_loss += self.loss(model(X), y)
+                single_client_test_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_test_loss /= float(count_batch)
             average_test_loss += single_client_test_loss
