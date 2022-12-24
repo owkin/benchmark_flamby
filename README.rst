@@ -15,9 +15,9 @@ $$\\max_{\\theta} \\sum_{k=0}^{K} m(f_{\\theta}(X_{k}), y_{k})$$
 
 where $K$ stands for the number of clients participating in the
 Federated Learning training, $p$ (or ``n_features``) stands for the number of features
-,$\\theta$ the parameters of the model of dimension $N$,
+,$\theta$ the parameters of the model of dimension $N$,
 $$X \\in \\mathbb{R}^{n \\times p} \\ , \\quad \\theta \\in \\mathbb{R}^N$$
-and m, the metric of interest.
+and $m$, the metric of interest.
 
 
 Install
@@ -52,7 +52,8 @@ Use ``benchopt run -h`` for more details about these options, or visit https://b
 
 FAQ
 ---
+.. code-block::
+   $ ModuleNotFoundError: No module named 'flamby.whatever' 
 
-Error: `ModuleNotFoundError: No module named 'flamby.fed_tcga_brca'`
-Make sure that benchopt CLI uses the right Python interpreter. To do that one
-might have to do `conda init bash` to put conda path in the PATH.
+Make sure that benchopt CLI uses the right Python interpreter. 
+To do that one might have to do `conda init bash` to put conda path in the PATH.
