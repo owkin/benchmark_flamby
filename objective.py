@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
     #from flamby.strategies import FedAveraging, FedProx, Scaffold, FedAdam
     from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.utils import evaluate_model_on_tests
-    from torch.utils.data import DataLoader
+    from torch.utils.data import DataLoader as dl
 
 
 # The benchmark objective must be named `Objective` and
@@ -25,11 +25,11 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3"
 
-    def set_data(self, train_datasets, val_datasets, test_datasets, model_arch, metric, loss):
+    def set_data(self, train_datasets, val_datasets, test_datasets, model_arch, metric, loss, batch_size_test):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
-        self.train_dataset, self.val_datasets, self.test_datasets, self.model_arch, self.metric, self.loss = train_datasets, val_datasets, test_datasets, model_arch, metric, loss
+        self.train_datasets, self.val_datasets, self.test_datasets, self.model_arch, self.metric, self.loss, self.batch_size_test = train_datasets, val_datasets, test_datasets, model_arch, metric, loss, batch_size_test
         # We init the model
         set_seed(self.seed)
         self.model = self.model_arch()
@@ -38,11 +38,12 @@ class Objective(BaseObjective):
     def compute(self, model):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
-        m = evaluate_models_on_tests(self.test_datasets, model, self.metric)
+        test_dls = [dl(test_d, batch_size=self.batch_size_test) for test_d in self.test_datasets]
+        res = evaluate_model_on_tests(model, test_dls, self.metric)
 
         # We assume everything is separable
         average_metric = 0.
-        for _, v in m.items():
+        for _, v in res.items():
             average_metric += v
         average_metric /= float(self.num_clients)
 
@@ -51,7 +52,7 @@ class Objective(BaseObjective):
         for train_d, test_d in zip(self.train_datasets, self.test_datasets):
             single_client_train_loss = 0.
             count_batch = 0
-            for X, y in DataLoader(train_d, batch_size=self.batch_size, shuffle=False):
+            for X, y in dl(train_d, batch_size=self.batch_size, shuffle=False):
                 single_client_train_loss += self.loss(model(X), y)
                 count_batch += 1
             single_client_train_loss /= float(count_batch)
@@ -59,7 +60,7 @@ class Objective(BaseObjective):
 
             single_client_test_loss = 0.
             count_batch = 0
-            for X, y in DataLoader(test_d, batch_size=self.batch_size, shuffle=False):
+            for X, y in dl(test_d, batch_size=self.batch_size, shuffle=False):
                 single_client_test_loss += self.loss(model(X), y)
                 count_batch += 1
             single_client_test_loss /= float(count_batch)
@@ -85,4 +86,5 @@ class Objective(BaseObjective):
             val_datasets=self.val_datasets,
             test_datasets=self.test_datasets,
             model=self.model,
+            loss=self.loss,
         )

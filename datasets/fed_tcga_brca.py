@@ -27,6 +27,10 @@ class Dataset(BaseDataset):
         'test': ["val", "test"],
         'seed': [42],
     }
+    def __init__(self):
+        super().__init__()
+        # We choose to define the test batch-size in the dataset as it is heavily dataset dependent
+        self.batch_size_test = 32
 
     def get_data(self):
         # The return arguments of this function are passed as keyword arguments
@@ -57,4 +61,4 @@ class Dataset(BaseDataset):
         # same for loss and model
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
-        return dict(train_datasets=self.train_datasets, val_datasets=self.val_datasets, test_datasets=self.test_datasets, model_arch=Baseline, metric=metric, loss=BaselineLoss)
+        return dict(train_datasets=self.train_datasets, val_datasets=self.val_datasets, test_datasets=self.test_datasets, model_arch=Baseline, metric=metric, loss=BaselineLoss, batch_size_test=self.batch_size_test)
