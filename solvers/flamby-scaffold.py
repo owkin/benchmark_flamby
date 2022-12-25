@@ -21,10 +21,11 @@ class Solver(BaseSolver):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
-        'learning_rate': [0.0001, 0.001, 0.01],
-        'server_learning_rate': [0.0001, 0.001, 0.01],
+        'learning_rate': [0.01],
+        'server_learning_rate': [0.01],
         "batch_size": [32], # we deviate from flamby's formulation to be able to change batch-size in solver API
         "num_updates": [100],
+        "nrounds": 10,
     }
 
     def set_objective(self, train_datasets, val_datasets, test_datasets, model, loss):
@@ -40,7 +41,7 @@ class Solver(BaseSolver):
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
         self.train_dls = [dl(train_d, batch_size=self.batch_size) for train_d in self.train_datasets]
-        strat = Scaffold(self.train_dls, self.model, self.loss, SGD, self.learning_rate, self.num_updates, n_iter, server_learning_rate=self.server_learning_rate)
+        strat = Scaffold(self.train_dls, self.model, self.loss, SGD, self.learning_rate, self.num_updates, nrounds=self.nrounds, server_learning_rate=self.server_learning_rate, log=True)
         m = strat.run()[0]
 
         self.model = m

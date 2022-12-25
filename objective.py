@@ -4,8 +4,6 @@ from benchopt import BaseObjective, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
-    #from flamby.strategies import FedAveraging, FedProx, Scaffold, FedAdam
     from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.utils import evaluate_model_on_tests
     from torch.utils.data import DataLoader as dl

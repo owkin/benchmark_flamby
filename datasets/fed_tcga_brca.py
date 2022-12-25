@@ -24,12 +24,15 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     # Any parameters 'param' defined here is available as `self.param`.
     parameters = {
-        'test': ["val", "test"],
+        'test': ["test"],
         'seed': [42],
     }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # We choose to define the test batch-size in the dataset as it is heavily dataset dependent
+        # In this case we must have batch_size_test > all tests sizes because metrics are not separable
+        # Test sizes when test==test, [63, 40, 42, 33, 33, 11], when batch_size > len(dataset) all 
+        # datasets is used.
         self.batch_size_test = 1000
 
     def get_data(self):
