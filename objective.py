@@ -70,7 +70,12 @@ class Objective(BaseObjective):
         average_test_loss /= float(self.num_clients)
         average_train_loss /= float(self.num_clients)
 
-        return dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss).update(res) 
+        metrics_dict = dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss)
+        for k, v in res.items():
+            metrics_dict[k] = v
+        return metrics_dict
+
+
 
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible
