@@ -14,7 +14,7 @@ with safe_import_context() as import_ctx:
 class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
-    name = "FLamby Average Metric across client"
+    name = "FLamby Average Metric across clients"
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.seed = 42
@@ -38,6 +38,10 @@ class Objective(BaseObjective):
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [dl(test_d, batch_size=self.batch_size_test) for test_d in self.test_datasets]
         res = evaluate_model_on_tests(model, test_dls, self.metric)
+
+        # Benchopt is all about minimizing stuff not maximizing
+        for k, v in res.items():
+            res[k] = 1. - v
 
         # We assume everything is separable
         average_metric = 0.
@@ -66,7 +70,7 @@ class Objective(BaseObjective):
         average_test_loss /= float(self.num_clients)
         average_train_loss /= float(self.num_clients)
 
-        return dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss)
+        return dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss).update(res) 
 
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible

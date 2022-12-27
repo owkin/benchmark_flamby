@@ -34,7 +34,7 @@ This benchmark can be run using the following commands:
    $ pip install -U benchopt
    $ cd ..
    $ git clone https://github.com/owkin/benchmark_flamby
-   $ benchopt run benchmark_flamby
+   $ benchopt run benchmark_flamby --timeout 1800
 
 Apart from the problem, options can be passed to ``benchopt run``, to restrict the benchmarks to some solvers or datasets, e.g.:
 
