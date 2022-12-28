@@ -37,7 +37,7 @@ class FLambySolver(BaseSolver):
         self.train_datasets, self.val_datasets, self.test_datasets, self.model, self.loss = train_datasets, val_datasets, test_datasets, model, loss
 
     def set_strategy_specific_args(self):
-        return {}
+        self.strategy_specific_args = {}
 
     def run(self, n_iter=100):
         # This is the function that is called to evaluate the solver.
