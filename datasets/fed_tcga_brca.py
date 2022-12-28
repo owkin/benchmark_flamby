@@ -11,12 +11,9 @@ with safe_import_context() as import_ctx:
     from flamby.benchmarks.benchmark_utils import set_seed
     from torch.utils.data import Subset
     from sklearn.model_selection import train_test_split
-    # It's horrendous but frankly it works
-    import sys
-    import os
-    sys.path.append(os.path.split(__file__)[0])
-    from template_flamby_dataset import FLambyDataset
-    
+    FLambyDataset = import_ctx.import_from(
+        'template_flamby_dataset', 'FLambyDataset'
+    )
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`

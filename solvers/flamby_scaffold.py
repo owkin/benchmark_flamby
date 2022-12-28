@@ -7,12 +7,9 @@ with safe_import_context() as import_ctx:
     from flamby.strategies import Scaffold
     from torch.utils.data import DataLoader as dl
     from torch.optim import SGD
-    # It's horrendous but frankly it works
-    import sys
-    import os
-    sys.path.append(os.path.split(__file__)[0])
-    from template_flamby_strategy import FLambySolver
-
+    FLambySolver = import_ctx.import_from(
+        'template_flamby_strategy', 'FLambySolver'
+    )
 
 
 # The benchmark solvers must be named `Solver` and
