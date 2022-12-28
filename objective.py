@@ -40,24 +40,25 @@ class Objective(BaseObjective):
         res = evaluate_model_on_tests(model, test_dls, self.metric)
 
         # Benchopt is all about minimizing stuff not maximizing
-        for k, v in res.items():
-            res[k] = 1. - v
-
-        # We assume everything is separable
         average_metric = 0.
-        for _, v in res.items():
-            average_metric += v
+        for k, v in res.copy().items():
+            single_client_metric = 1. - res.pop(k)
+            average_metric += single_client_metric 
+            res["value_" + k] = single_client_metric
         average_metric /= float(self.num_clients)
+        res["value"] = average_metric
+
 
         average_test_loss = 0.
         average_train_loss = 0.
-        for train_d, test_d in zip(self.train_datasets, self.test_datasets):
+        for idx, (train_d, test_d) in enumerate(zip(self.train_datasets, self.test_datasets)):
             single_client_train_loss = 0.
             count_batch = 0
             for X, y in dl(train_d, batch_size=self.batch_size_test, shuffle=False):
                 single_client_train_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_train_loss /= float(count_batch)
+            res[f"train_loss_client_{idx}"] = single_client_train_loss
             average_train_loss += single_client_train_loss
 
             single_client_test_loss = 0.
@@ -66,14 +67,15 @@ class Objective(BaseObjective):
                 single_client_test_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_test_loss /= float(count_batch)
+            res[f"test_loss_client_{idx}"] = single_client_test_loss
             average_test_loss += single_client_test_loss
-        average_test_loss /= float(self.num_clients)
-        average_train_loss /= float(self.num_clients)
 
-        metrics_dict = dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss)
-        for k, v in res.items():
-            metrics_dict["value_" + k] = v
-        return metrics_dict
+        average_train_loss /= float(self.num_clients)
+        average_test_loss /= float(self.num_clients)
+        res["average_train_loss"] = average_train_loss
+        res["average_test_loss"] = average_test_loss
+
+        return res
 
 
 
