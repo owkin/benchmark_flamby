@@ -23,7 +23,6 @@ class FLambySolver(BaseSolver):
         'learning_rate': [0.01],
         "batch_size": [32], # we deviate from flamby's formulation to be able to change batch-size in solver API
         "num_updates": [100],
-        "nrounds": [10],
     }
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,13 +39,13 @@ class FLambySolver(BaseSolver):
     def set_strategy_specific_args(self):
         return {}
 
-    def run(self, n_iter):
+    def run(self, n_iter=100):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
         self.train_dls = [dl(train_d, batch_size=self.batch_size) for train_d in self.train_datasets]
         self.set_strategy_specific_args()
-        strat = self.strategy(self.train_dls, self.model, self.loss, SGD, self.learning_rate, self.num_updates, nrounds=self.nrounds, **self.strategy_specific_args)
+        strat = self.strategy(self.train_dls, self.model, self.loss, SGD, self.learning_rate, self.num_updates, nrounds=n_iter, **self.strategy_specific_args)
         # We take the first model, but we could return the full list for model personalization
         m = strat.run()[0]
 
