@@ -72,7 +72,7 @@ class Objective(BaseObjective):
 
         metrics_dict = dict(value=average_metric, average_train_loss=average_train_loss, average_test_loss=average_test_loss)
         for k, v in res.items():
-            metrics_dict[k] = v
+            metrics_dict["value_" + k] = v
         return metrics_dict
 
 
