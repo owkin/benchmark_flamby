@@ -39,7 +39,7 @@ class FLambySolver(BaseSolver):
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {}
 
-    def run(self, n_iter=100):
+    def run(self, n_iter=50):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
 

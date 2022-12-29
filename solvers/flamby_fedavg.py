@@ -27,7 +27,6 @@ class Solver(FLambySolver):
         'learning_rate': [0.01],
         "batch_size": [32], # we deviate from flamby's formulation to be able to change batch-size in solver API
         "num_updates": [100],
-        "nrounds": [10],
     }
     def __init__(self, *args, **kwargs):
         super().__init__(strategy=FedAvg, *args, **kwargs)
