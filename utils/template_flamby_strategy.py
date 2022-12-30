@@ -8,22 +8,22 @@ with safe_import_context() as import_ctx:
     from torch.optim import SGD
 
 
-
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class FLambySolver(BaseSolver):
 
     # Name to select the solver in the CLI and to display the results.
-    name = 'Strategy'
+    name = "Strategy"
 
     # List of parameters for the solver. The benchmark will consider
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
-        'learning_rate': [0.01],
-        "batch_size": [32], # we deviate from flamby's formulation to be able to change batch-size in solver API
+        "learning_rate": [0.01],
+        "batch_size": [32],  # we deviate from flamby's fixed batch-size
         "num_updates": [100],
     }
+
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
@@ -33,8 +33,14 @@ class FLambySolver(BaseSolver):
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
-        # It is customizable for each benchmark., 
-        self.train_datasets, self.val_datasets, self.test_datasets, self.model, self.loss = train_datasets, val_datasets, test_datasets, model, loss
+        # It is customizable for each benchmark.,
+        self.train_datasets, self.val_datasets, self.test_datasets, self.model, self.loss = (
+            train_datasets,
+            val_datasets,
+            test_datasets,
+            model,
+            loss,
+        )
 
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {}
@@ -43,9 +49,20 @@ class FLambySolver(BaseSolver):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
-        self.train_dls = [dl(train_d, batch_size=self.batch_size) for train_d in self.train_datasets]
+        self.train_dls = [
+            dl(train_d, batch_size=self.batch_size) for train_d in self.train_datasets
+        ]
         self.set_strategy_specific_args()
-        strat = self.strategy(self.train_dls, self.model, self.loss, SGD, self.learning_rate, self.num_updates, nrounds=n_iter, **self.strategy_specific_args)
+        strat = self.strategy(
+            self.train_dls,
+            self.model,
+            self.loss,
+            SGD,
+            self.learning_rate,
+            self.num_updates,
+            nrounds=n_iter,
+            **self.strategy_specific_args
+        )
         # We take the first model, but we could return the full list for model personalization
         m = strat.run()[0]
 
