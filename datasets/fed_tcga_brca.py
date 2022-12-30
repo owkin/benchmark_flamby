@@ -12,8 +12,8 @@ with safe_import_context() as import_ctx:
         Baseline,
         BaselineLoss,
     )
-
-    FLambyDataset = import_ctx.import_from("template_flamby_dataset", "FLambyDataset")
+    template_file_name = "template_flamby_dataset"
+    FLambyDataset = import_ctx.import_from(template_file_name, "FLambyDataset")
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`

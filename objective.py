@@ -38,16 +38,19 @@ class Objective(BaseObjective):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
-        self.train_datasets, self.val_datasets, self.test_datasets, self.model_arch, self.metric, self.loss, self.num_clients, self.batch_size_test = (
-            train_datasets,
-            val_datasets,
-            test_datasets,
-            model_arch,
-            metric,
-            loss,
-            num_clients,
-            batch_size_test,
-        )
+        att_names = [
+            "train_datasets",
+            "val_datasets",
+            "test_datasets",
+            "model_arch",
+            "metric",
+            "loss",
+            "num_clients",
+            "batch_size_test",
+        ]
+        for att in att_names:
+            setattr(self, att, eval(att))
+
         # We init the model
         set_seed(self.seed)
         self.model = self.model_arch()
@@ -56,7 +59,7 @@ class Objective(BaseObjective):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
-            dl(test_d, batch_size=self.batch_size_test) for test_d in self.test_datasets
+            dl(test_d, self.batch_size_test) for test_d in self.test_datasets
         ]
         res = evaluate_model_on_tests(model, test_dls, self.metric)
 
@@ -76,7 +79,7 @@ class Objective(BaseObjective):
         ):
             single_client_train_loss = 0.0
             count_batch = 0
-            for X, y in dl(train_d, batch_size=self.batch_size_test, shuffle=False):
+            for X, y in dl(train_d, self.batch_size_test, shuffle=False):
                 single_client_train_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_train_loss /= float(count_batch)
@@ -85,7 +88,7 @@ class Objective(BaseObjective):
 
             single_client_test_loss = 0.0
             count_batch = 0
-            for X, y in dl(test_d, batch_size=self.batch_size_test, shuffle=False):
+            for X, y in dl(test_d, self.batch_size_test, shuffle=False):
                 single_client_test_loss += self.loss(model(X), y).item()
                 count_batch += 1
             single_client_test_loss /= float(count_batch)

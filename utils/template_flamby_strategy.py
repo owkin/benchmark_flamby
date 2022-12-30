@@ -28,19 +28,25 @@ class FLambySolver(BaseSolver):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
 
-    def set_objective(self, train_datasets, val_datasets, test_datasets, model, loss):
+    def set_objective(self,
+                      train_datasets,
+                      val_datasets,
+                      test_datasets,
+                      model,
+                      loss):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.,
-        self.train_datasets, self.val_datasets, self.test_datasets, self.model, self.loss = (
-            train_datasets,
-            val_datasets,
-            test_datasets,
-            model,
-            loss,
-        )
+        att_names = ["train_datasets",
+                     "val_datasets",
+                     "test_datasets",
+                     "model",
+                     "loss"]
+
+        for att in att_names:
+            setattr(self, att, eval(att))
 
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {}
@@ -50,7 +56,7 @@ class FLambySolver(BaseSolver):
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
         self.train_dls = [
-            dl(train_d, batch_size=self.batch_size) for train_d in self.train_datasets
+            dl(train_d, self.batch_size) for train_d in self.train_datasets
         ]
         self.set_strategy_specific_args()
         strat = self.strategy(
@@ -63,7 +69,8 @@ class FLambySolver(BaseSolver):
             nrounds=n_iter,
             **self.strategy_specific_args
         )
-        # We take the first model, but we could return the full list for model personalization
+        # We take the first model, but we could return the full list for model
+        # personalization
         m = strat.run()[0]
 
         self.model = m

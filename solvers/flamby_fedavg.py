@@ -5,8 +5,8 @@ from benchopt import safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from flamby.strategies import FedAvg
-
-    FLambySolver = import_ctx.import_from("template_flamby_strategy", "FLambySolver")
+    template_file_name = "template_flamby_strategy"
+    FLambySolver = import_ctx.import_from(template_file_name, "FLambySolver")
 
 
 # The benchmark solvers must be named `Solver` and
@@ -23,7 +23,7 @@ class Solver(FLambySolver):
         "learning_rate": [0.01],
         "batch_size": [
             32
-        ],  # we deviate from flamby's formulation to be able to change batch-size in solver API
+        ],
         "num_updates": [100],
     }
 

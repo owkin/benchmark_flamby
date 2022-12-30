@@ -18,7 +18,7 @@ if __name__ == "__main__":
     text = text.replace("#BENCHMARK_NAME", BENCHMARK_NAME)
 
     text = "\n".join(
-        [line for line in text.splitlines()[13:] if "template_benchmark" not in line]
+        [l for l in text.splitlines()[13:] if "template_benchmark" not in l]
         + [""]
     )
 
