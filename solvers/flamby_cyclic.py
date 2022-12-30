@@ -30,7 +30,7 @@ class Solver(FLambySolver):
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__(strategy=Scaffold, *args, **kwargs)
+        super().__init__(strategy=Cyclic, *args, **kwargs)
 
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {
