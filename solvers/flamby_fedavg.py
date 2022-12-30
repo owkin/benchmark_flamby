@@ -1,12 +1,10 @@
-from benchopt import BaseSolver, safe_import_context
+from benchopt import safe_import_context
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from flamby.strategies import FedAvg
-    from torch.utils.data import DataLoader as dl
-    from torch.optim import SGD
     FLambySolver = import_ctx.import_from(
         'template_flamby_strategy', 'FLambySolver'
     )

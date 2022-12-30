@@ -1,16 +1,12 @@
-from benchopt import BaseDataset, safe_import_context
+from benchopt import safe_import_context
 
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
     from flamby.datasets.fed_tcga_brca import FedTcgaBrca as FedDataset
     from flamby.datasets.fed_tcga_brca import metric, NUM_CLIENTS, Baseline, BaselineLoss
-    from flamby.benchmarks.benchmark_utils import set_seed
-    from torch.utils.data import Subset
-    from sklearn.model_selection import train_test_split
     FLambyDataset = import_ctx.import_from(
         'template_flamby_dataset', 'FLambyDataset'
     )
