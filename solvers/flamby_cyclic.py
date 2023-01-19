@@ -21,7 +21,6 @@ class Solver(FLambySolver):
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
         "learning_rate": [0.01],
-        "server_learning_rate": [1.0],
         "batch_size": [
             32
         ],
@@ -34,6 +33,5 @@ class Solver(FLambySolver):
 
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {
-            "server_learning_rate": self.server_learning_rate,
             "deterministic_cycle": self.deterministic_cycle,
         }

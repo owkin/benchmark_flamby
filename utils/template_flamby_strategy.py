@@ -27,6 +27,7 @@ class FLambySolver(BaseSolver):
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
+        self.stopping_strategy = "iteration"
 
     def set_objective(self,
                       train_datasets,
@@ -51,7 +52,7 @@ class FLambySolver(BaseSolver):
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {}
 
-    def run(self, n_iter=50):
+    def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
