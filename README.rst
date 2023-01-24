@@ -40,7 +40,7 @@ Apart from the problem, options can be passed to ``benchopt run``, to restrict t
 
 .. code-block::
 
-	$ benchopt run benchmark_flamby -s scaffold -d fed_tcga_brca --max-runs 10 --n-repetitions 2
+	$ benchopt run benchmark_flamby --max-runs 12 --timeout 36000000000
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
