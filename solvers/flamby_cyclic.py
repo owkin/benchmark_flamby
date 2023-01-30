@@ -20,7 +20,7 @@ class Solver(FLambySolver):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
-        "learning_rate": [0.01],
+        "learning_rate": [0.01, 0.001, 0.0001],
         "batch_size": [
             32
         ],

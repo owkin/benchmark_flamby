@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -23,11 +24,11 @@ class FLambySolver(BaseSolver):
         "batch_size": [32],  # we deviate from flamby's fixed batch-size
         "num_updates": [100],
     }
+    stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
 
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
-        self.stopping_strategy = "iteration"
 
     def set_objective(self,
                       train_datasets,
@@ -52,7 +53,7 @@ class FLambySolver(BaseSolver):
     def set_strategy_specific_args(self):
         self.strategy_specific_args = {}
 
-    def run(self, n_iter):
+    def run(self, callback):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
 
@@ -67,18 +68,24 @@ class FLambySolver(BaseSolver):
             SGD,
             self.learning_rate,
             self.num_updates,
-            nrounds=n_iter,
+            nrounds=100,
             **self.strategy_specific_args
         )
+
         # We take the first model, but we could return the full list for model
         # personalization
-        m = strat.run()[0]
+        while callback(strat.models_list[0].model):
+            strat.perform_round()
 
-        self.model = m
+        self.final_model = strat.models_list[0].model
 
     def get_result(self):
         # Return the result from one optimization run.
         # The outputs of this function are the arguments of `Objective.compute`
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
-        return self.model
+        return self.final_model
+
+    @staticmethod
+    def get_next(stop_val):
+        return stop_val + 10
