@@ -25,6 +25,7 @@ class FLambySolver(BaseSolver):
         "batch_size": [32],  # we deviate from flamby's fixed batch-size
         "num_updates": [100],
     }
+    # We basically do not stop
     stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
 
     def __init__(self, strategy, *args, **kwargs):
@@ -56,7 +57,7 @@ class FLambySolver(BaseSolver):
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations `n_iter`.
+        # It runs the algorithm for a given a number of iterations (max_runs * 10)
 
         self.train_dls = [
             dl(train_d, self.batch_size) for train_d in self.train_datasets
@@ -72,10 +73,8 @@ class FLambySolver(BaseSolver):
             nrounds=-100, # It won't be used anyway as we do not call the run method
             **self.strategy_specific_args
         )
-        # We take the first model, but we could return the full list for model
-        # personalization
         # We are reproducing the run method but this time a callback checks stopping-criterion
-        # at each round
+        # at each round, which allows to cache computations and do a single run
         while callback(strat.models_list[0].model):
             strat.perform_round()
 

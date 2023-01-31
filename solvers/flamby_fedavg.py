@@ -7,6 +7,7 @@ with safe_import_context() as import_ctx:
     from flamby.strategies import FedAvg
     template_file_name = "template_flamby_strategy"
     FLambySolver = import_ctx.import_from(template_file_name, "FLambySolver")
+    lrs = import_ctx.import_from("common", "lrs")
 
 
 # The benchmark solvers must be named `Solver` and
@@ -20,7 +21,7 @@ class Solver(FLambySolver):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
-        "learning_rate": [0.01],
+        "learning_rate": lrs,
         "batch_size": [
             32
         ],
