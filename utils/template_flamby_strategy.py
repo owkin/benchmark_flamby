@@ -1,5 +1,6 @@
 from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import SufficientProgressCriterion
+from tqdm import tqdm
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -68,12 +69,13 @@ class FLambySolver(BaseSolver):
             SGD,
             self.learning_rate,
             self.num_updates,
-            nrounds=100,
+            nrounds=-100, # It won't be used anyway as we do not call the run method
             **self.strategy_specific_args
         )
-
         # We take the first model, but we could return the full list for model
         # personalization
+        # We are reproducing the run method but this time a callback checks stopping-criterion
+        # at each round
         while callback(strat.models_list[0].model):
             strat.perform_round()
 
@@ -86,6 +88,9 @@ class FLambySolver(BaseSolver):
         # it is customizable for each benchmark.
         return self.final_model
 
+    # Not used if callback is used
     @staticmethod
     def get_next(stop_val):
+        """This function gives the sampling rate of the curve.
+        """
         return stop_val + 10
