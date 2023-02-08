@@ -100,7 +100,7 @@ class Objective(BaseObjective):
                 average_metric += single_client_metric
             res["value_" + k] = single_client_metric
 
-        average_metric /= float(self.num_clients - nb_clients_nan)
+        average_metric /= float(len(res.keys()) - nb_clients_nan)
         res["value"] = average_metric
         res["value_pooled"] = pooled_res_value
 
