@@ -25,7 +25,9 @@ class Dataset(FLambyDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     # Any parameters 'param' defined here is available as `self.param`.
-    parameters = {"test": ["test"], "seed": [42]}
+    parameters = {"train": ["pooled"], "test": ["test"], "seed": [42]}
+
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(
@@ -34,6 +36,7 @@ class Dataset(FLambyDataset):
             loss=BaselineLoss,
             num_clients=NUM_CLIENTS,
             metric=metric,
+            test_size=0.25,
             *args,
             **kwargs
         )

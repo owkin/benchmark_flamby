@@ -1,4 +1,5 @@
 from benchopt import BaseObjective, safe_import_context
+import numpy as np
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -29,6 +30,7 @@ class Objective(BaseObjective):
         train_datasets,
         val_datasets,
         test_datasets,
+        pooled_test_dataset,
         model_arch,
         metric,
         loss,
@@ -42,6 +44,7 @@ class Objective(BaseObjective):
             "train_datasets",
             "val_datasets",
             "test_datasets",
+            "pooled_test_dataset",
             "model_arch",
             "metric",
             "loss",
@@ -55,46 +58,75 @@ class Objective(BaseObjective):
         set_seed(self.seed)
         self.model = self.model_arch()
 
+
+    def compute_average_loss_on_client(self, model, dataset):
+        average_loss = 0.0
+        count_batch = 0
+        for X, y in dl(dataset, self.batch_size_test, shuffle=False):
+            average_loss += self.loss(model(X), y).item()
+            count_batch += 1
+        average_loss /= float(count_batch)
+        return average_loss
+
+
     def compute(self, model):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
-            dl(test_d, self.batch_size_test) for test_d in self.test_datasets
+            dl(test_d, self.batch_size_test, shuffle=False) for test_d in self.test_datasets
         ]
-        res = evaluate_model_on_tests(model, test_dls, self.metric)
 
-        # Benchopt is all about minimizing stuff not maximizing
+        def robust_metric(y_true, y_pred):
+            try:
+                return self.metric(y_true, y_pred)
+            except:
+                return np.nan
+
+        # Evaluation on the different test sets
+        res = evaluate_model_on_tests(model, test_dls, robust_metric)
+
+        # Evaluation on the pooled test set
+        pooled_res_value = evaluate_model_on_tests(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]
+
+        # We do not take into account clients where metric is not defined and use the average metric across clients as the default benchopt metric "value"
+        # Note that we weigh all clients equally
         average_metric = 0.0
-        for k, v in res.copy().items():
-            single_client_metric = 1.0 - res.pop(k)
-            average_metric += single_client_metric
+        nb_clients_nan = 0
+        for k, _ in res.copy().items():
+            single_client_metric = res.pop(k)
+            if np.isnan(float(single_client_metric)):
+                nb_clients_nan += 1
+            else: 
+                average_metric += single_client_metric
             res["value_" + k] = single_client_metric
-        average_metric /= float(self.num_clients)
-        res["value"] = average_metric
 
+        average_metric /= float(self.num_clients - nb_clients_nan)
+        res["value"] = average_metric
+        res["value_pooled"] = pooled_res_value
+
+        # We also compute average losses on batches on the different clients both on test and train
         average_test_loss = 0.0
         average_train_loss = 0.0
         for idx, (train_d, test_d) in enumerate(
             zip(self.train_datasets, self.test_datasets)
         ):
-            single_client_train_loss = 0.0
-            count_batch = 0
-            for X, y in dl(train_d, self.batch_size_test, shuffle=False):
-                single_client_train_loss += self.loss(model(X), y).item()
-                count_batch += 1
-            single_client_train_loss /= float(count_batch)
+            single_client_train_loss = self.compute_average_loss_on_client(model, train_d)
             res[f"train_loss_client_{idx}"] = single_client_train_loss
             average_train_loss += single_client_train_loss
 
-            single_client_test_loss = 0.0
-            count_batch = 0
-            for X, y in dl(test_d, self.batch_size_test, shuffle=False):
-                single_client_test_loss += self.loss(model(X), y).item()
-                count_batch += 1
-            single_client_test_loss /= float(count_batch)
+            single_client_test_loss = self.compute_average_loss_on_client(model, test_d)
             res[f"test_loss_client_{idx}"] = single_client_test_loss
             average_test_loss += single_client_test_loss
 
+        # We compute average pooled loss on test if it doesn't exist already
+        if len(self.test_datasets) > 1:
+            pooled_test_loss = self.compute_average_loss_on_client(model, self.pooled_test_dataset)
+        else:
+            pooled_test_loss = res[f"test_loss_client_0"]
+
+        res["pooled_test_loss"] = pooled_test_loss
+
+        # We compute average losses across clients, weighting clients equally
         average_train_loss /= float(self.num_clients)
         average_test_loss /= float(self.num_clients)
         res["average_train_loss"] = average_train_loss
