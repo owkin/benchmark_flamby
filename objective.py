@@ -1,5 +1,7 @@
 from benchopt import BaseObjective, safe_import_context
 import numpy as np
+import re
+from itertools import zip_longest
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -92,12 +94,14 @@ class Objective(BaseObjective):
         # Note that we weigh all clients equally
         average_metric = 0.0
         nb_clients_nan = 0
+        skip_clients = []
         for k, _ in res.copy().items():
             single_client_metric = res.pop(k)
             if np.isnan(float(single_client_metric)):
+                skip_clients.append(int(re.findall("[0-9]+", k)[0]))
                 nb_clients_nan += 1
-            else: 
-                average_metric += single_client_metric
+                continue
+            average_metric += single_client_metric
             res["value_" + k] = single_client_metric
 
         average_metric /= float(len(res.keys()) - nb_clients_nan)
@@ -108,15 +112,21 @@ class Objective(BaseObjective):
         average_test_loss = 0.0
         average_train_loss = 0.0
         for idx, (train_d, test_d) in enumerate(
-            zip(self.train_datasets, self.test_datasets)
-        ):
-            single_client_train_loss = self.compute_average_loss_on_client(model, train_d)
-            res[f"train_loss_client_{idx}"] = single_client_train_loss
-            average_train_loss += single_client_train_loss
+            zip_longest(self.train_datasets, self.test_datasets)
+        ):  
+            if train_d is not None:
+                single_client_train_loss = self.compute_average_loss_on_client(model, train_d)
+                res[f"train_loss_client_{idx}"] = single_client_train_loss
+                average_train_loss += single_client_train_loss
 
-            single_client_test_loss = self.compute_average_loss_on_client(model, test_d)
-            res[f"test_loss_client_{idx}"] = single_client_test_loss
-            average_test_loss += single_client_test_loss
+            # If metrics is not defined then the test loss should not be computed
+            if idx in skip_clients:
+                continue
+            
+            if test_d is not None:
+                single_client_test_loss = self.compute_average_loss_on_client(model, test_d)
+                res[f"test_loss_client_{idx}"] = single_client_test_loss
+                average_test_loss += single_client_test_loss
 
         # We compute average pooled loss on test if it doesn't exist already
         if len(self.test_datasets) > 1:
@@ -124,13 +134,17 @@ class Objective(BaseObjective):
         else:
             pooled_test_loss = res[f"test_loss_client_0"]
 
+
         res["pooled_test_loss"] = pooled_test_loss
 
+        num_train_sets = len(self.train_datasets)
+        num_test_sets = len(self.test_datasets)
         # We compute average losses across clients, weighting clients equally
-        average_train_loss /= float(self.num_clients)
-        average_test_loss /= float(self.num_clients)
+        average_train_loss /= float(num_train_sets)
+        average_test_loss /= float(num_test_sets - nb_clients_nan)
         res["average_train_loss"] = average_train_loss
         res["average_test_loss"] = average_test_loss
+
 
         return res
 
