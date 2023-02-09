@@ -27,7 +27,7 @@ You can even use most python FL-frameworks such as [substra](https://github.com/
 Install
 -------
 
-First go to [FLamby](https://github.com/owkin/FLamby) and install it using the following commands (see the [API doc](https://owkin.github.io/FLamby/) if needed):
+First go to Flamby_ and install it using the following commands (see the API Doc_ if needed):
 
 .. code-block::
    $ git clone https://github.com/owkin/FLamby.git
@@ -54,7 +54,7 @@ And here is how to obtain the results of the best parameters from the cross-vali
    $ benchopt run --timeout 36000000000 --max-runs 12 -d FedTcgaBrca
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
-find Fed-Heart-Disease's download's instructions [here](https://owkin.github.io/FLamby/fed_heart.html).
+find Fed-Heart-Disease's download's instructions here_.
 Then once the dataset is downloaded one can run similarly:
 For the cross-validation:
 .. code-block::
@@ -71,6 +71,13 @@ Use ``benchopt run -h`` for more details about these options, or visit https://b
    :target: https://github.com/owkin/benchmark_flamby/actions
 .. |Python 3.6+| image:: https://img.shields.io/badge/python-3.6%2B-blue
    :target: https://www.python.org/downloads/release/python-360/
+
+    
+.. _Flamby: https://github.com/owkin/FLamby
+    
+.. _Doc: https://owkin.github.io/FLamby/
+
+.. _here: https://owkin.github.io/FLamby/fed_heart.html#download-and-preprocessing-instructions
 
 FAQ
 ---
