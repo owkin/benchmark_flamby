@@ -7,6 +7,8 @@ with safe_import_context() as import_ctx:
     from flamby.strategies import Scaffold
     template_file_name = "template_flamby_strategy"
     FLambySolver = import_ctx.import_from(template_file_name, "FLambySolver")
+    lrs = import_ctx.import_from("common", "lrs")
+    slrs = import_ctx.import_from("common", "slrs")
 
 
 # The benchmark solvers must be named `Solver` and

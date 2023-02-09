@@ -3,10 +3,8 @@ Benchmarking FL strategies on FLamby with benchopt
 ==================================================
 |Build Status| |Python 3.6+|
 
-Benchopt is a package to simplify and make more transparent and
-reproducible the comparisons of optimization algorithms.
-This benchmark is dedicated to tuning FL strategies on FLamby's datasets.
-The goal is to maximize the average metric using each provided model
+This benchmark is dedicated to tuning cross-silo FL strategies on [FLamby](https://github.com/owkin/FLamby)'s datasets.
+The goal is to maximize the average metric across clients using each provided model
 on the val/test clients:
 
 
@@ -18,29 +16,53 @@ Federated Learning training, $p$ (or ``n_features``) stands for the number of fe
 , $ \\theta $ the parameters of the model of dimension $N$,
 $$X \\in \\mathbb{R}^{n \\times p} \\ , \\quad \\theta \\in \\mathbb{R}^N$$
 and $m$, the metric of interest.
+To ease comparison, we fix the number of local updates to 100 and the maximum number of rounds
+to 12.
+
+**Try to beat the FLamby by adding your own solver !**
+You can even use most python FL-frameworks such as [substra](https://github.com/Substra/substrafl) or 
+[Fed-BioMed](https://gitlab.inria.fr/fedbiomed/fedbiomed) to build your solver !
 
 
 Install
---------
+-------
 
-This benchmark can be run using the following commands:
+First go to [FLamby](https://github.com/owkin/FLamby) and install it using the following commands (see the [API doc](https://owkin.github.io/FLamby/) if needed):
 
 .. code-block::
    $ git clone https://github.com/owkin/FLamby.git
    $ cd FLamby
    $ conda create -n benchmark_flamby
    $ conda activate benchmark_flamby
-   $ pip install -e ".[all_extra]"
+   $ pip install -e ".[all_extra]" # Note that the all_extra option installs all dependencies for all 7 datasets
+
+This benchmark can then be run on Fed-TCGA-BRCA for a specific learning rate using the following commands:
+
+.. code-block::
    $ pip install -U benchopt
    $ cd ..
    $ git clone https://github.com/owkin/benchmark_flamby
-   $ benchopt run benchmark_flamby --timeout 1800
+   $ cd benchmark_flamby
+   $ benchopt run --timeout 36000000000 --max-runs 12 -s FederatedAveraging -learning-rate 0.001 -d FedTcgaBrca
 
-Apart from the problem, options can be passed to ``benchopt run``, to restrict the benchmarks to some solvers or datasets, e.g.:
-
+For the whole benchmark on Fed-Tcga-Brca, here is how to reproduce the cross-validation:
 .. code-block::
+   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedTcgaBrca
 
-	$ benchopt run benchmark_flamby --max-runs 12 --timeout 36000000000
+And here is how to obtain the results of the best parameters from the cross-validation on the test sets:
+.. code-block::
+   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedTcgaBrca
+
+To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
+find Fed-Heart-Disease's download's instructions [here](https://owkin.github.io/FLamby/fed_heart.html).
+Then once the dataset is downloaded one can run similarly:
+For the cross-validation:
+.. code-block::
+   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedHeartDisease
+
+For the results on the test sets:
+.. code-block::
+   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedHeartDisease
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
