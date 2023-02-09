@@ -3,7 +3,7 @@ Benchmarking FL strategies on FLamby with benchopt
 ==================================================
 |Build Status| |Python 3.6+|
 
-This benchmark is dedicated to tuning cross-silo FL strategies on [FLamby](https://github.com/owkin/FLamby)'s datasets.
+This benchmark is dedicated to tuning cross-silo FL strategies on Flamby_'s datasets.
 The goal is to maximize the average metric across clients using each provided model
 on the val/test clients:
 
@@ -20,8 +20,7 @@ To ease comparison, we fix the number of local updates to 100 and the maximum nu
 to 12.
 
 **Try to beat the FLamby by adding your own solver !**
-You can even use most python FL-frameworks such as [substra](https://github.com/Substra/substrafl) or 
-[Fed-BioMed](https://gitlab.inria.fr/fedbiomed/fedbiomed) to build your solver !
+You can even use most python FL-frameworks such as substra_ or FedBioMed_ to build your solver !
 
 
 Install
@@ -78,6 +77,11 @@ Use ``benchopt run -h`` for more details about these options, or visit https://b
 .. _Doc: https://owkin.github.io/FLamby/
 
 .. _here: https://owkin.github.io/FLamby/fed_heart.html#download-and-preprocessing-instructions
+
+.. _substra: https://github.com/Substra/substrafl
+
+.. _FedBioMed: https://gitlab.inria.fr/fedbiomed/fedbiomed
+
 
 FAQ
 ---
