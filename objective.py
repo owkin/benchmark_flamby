@@ -30,8 +30,8 @@ class Objective(BaseObjective):
     def set_data(
         self,
         train_datasets,
-        val_datasets,
         test_datasets,
+        is_validation,
         pooled_test_dataset,
         model_arch,
         metric,
@@ -44,8 +44,8 @@ class Objective(BaseObjective):
         # API to pass data. This is customizable for each benchmark.
         att_names = [
             "train_datasets",
-            "val_datasets",
             "test_datasets",
+            "is_validation",
             "pooled_test_dataset",
             "model_arch",
             "metric",
@@ -60,7 +60,6 @@ class Objective(BaseObjective):
         set_seed(self.seed)
         self.model = self.model_arch()
 
-
     def compute_average_loss_on_client(self, model, dataset):
         average_loss = 0.0
         count_batch = 0
@@ -69,7 +68,6 @@ class Objective(BaseObjective):
             count_batch += 1
         average_loss /= float(count_batch)
         return average_loss
-
 
     def compute(self, model):
         # This method can return many metrics in a dictionary. One of these
@@ -83,6 +81,11 @@ class Objective(BaseObjective):
                 return self.metric(y_true, y_pred)
             except:
                 return np.nan
+
+        if self.is_validation:
+            test_name = "val"
+        else:
+            test_name = "test"
 
         # Evaluation on the different test sets
         res = evaluate_model_on_tests(model, test_dls, robust_metric)
@@ -102,18 +105,20 @@ class Objective(BaseObjective):
                 nb_clients_nan += 1
                 continue
             average_metric += single_client_metric
-            res["value_" + k] = single_client_metric
+            res[k + "_" + test_name + "_metric"] = single_client_metric
 
         average_metric /= float(len(res.keys()) - nb_clients_nan)
-        res["value"] = average_metric
-        res["value_pooled"] = pooled_res_value
+
+        res["average_" + test_name + "_metric"] = average_metric
+
+        res["pooled_" + test_name + "_metric"] = pooled_res_value
 
         # We also compute average losses on batches on the different clients both on test and train
         average_test_loss = 0.0
         average_train_loss = 0.0
         for idx, (train_d, test_d) in enumerate(
             zip_longest(self.train_datasets, self.test_datasets)
-        ):  
+        ):
             if train_d is not None:
                 single_client_train_loss = self.compute_average_loss_on_client(model, train_d)
                 res[f"train_loss_client_{idx}"] = single_client_train_loss
@@ -122,20 +127,19 @@ class Objective(BaseObjective):
             # If metrics is not defined then the test loss should not be computed
             if idx in skip_clients:
                 continue
-            
+
             if test_d is not None:
                 single_client_test_loss = self.compute_average_loss_on_client(model, test_d)
-                res[f"test_loss_client_{idx}"] = single_client_test_loss
+                res[test_name + f"_loss_client_{idx}"] = single_client_test_loss
                 average_test_loss += single_client_test_loss
 
-        # We compute average pooled loss on test if it doesn't exist already
+        # We compute average loss on test if it doesn't exist already
         if len(self.test_datasets) > 1:
             pooled_test_loss = self.compute_average_loss_on_client(model, self.pooled_test_dataset)
         else:
-            pooled_test_loss = res[f"test_loss_client_0"]
+            pooled_test_loss = res[test_name + "_loss_client_0"]
 
-
-        res["pooled_test_loss"] = pooled_test_loss
+        res["average_" + test_name + "_loss"] = pooled_test_loss
 
         num_train_sets = len(self.train_datasets)
         num_test_sets = len(self.test_datasets)
@@ -143,8 +147,16 @@ class Objective(BaseObjective):
         average_train_loss /= float(num_train_sets)
         average_test_loss /= float(num_test_sets - nb_clients_nan)
         res["average_train_loss"] = average_train_loss
-        res["average_test_loss"] = average_test_loss
+        res["average_" + test_name + "_loss"] = average_test_loss
 
+        # Very important because of check_convergence that operates on val if is_validation
+        # or on train
+        if self.is_validation:
+            objective_value = average_test_loss
+        else:
+            objective_value = average_train_loss
+        
+        res["value"] = objective_value
 
         return res
 
@@ -161,8 +173,8 @@ class Objective(BaseObjective):
         # It is customizable for each benchmark.
         return dict(
             train_datasets=self.train_datasets,
-            val_datasets=self.val_datasets,
             test_datasets=self.test_datasets,
+            is_validation=self.is_validation,
             model=self.model,
             loss=self.loss,
         )

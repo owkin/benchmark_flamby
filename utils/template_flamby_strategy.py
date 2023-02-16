@@ -53,7 +53,7 @@ class FLambySolver(BaseSolver):
         objective = objective_list[-1][self.key_to_monitor]
 
         # We exit if one value of the objective is lower than the starting point
-        delta_objective_from_start = (objective - start_objective) / start_objective
+        delta_objective_from_start = (start_objective - objective) / start_objective
         if delta_objective_from_start < 0.:
             self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")
             return True, 1
@@ -73,7 +73,7 @@ class FLambySolver(BaseSolver):
 
         progress = math.log(max(abs(delta), self.eps)) / math.log(self.eps)
         return False, progress
-    
+
     stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
     # We override dynamically the method of the instance, inheritance would be cleaner but
     # I could not make it work because of pickling issues
@@ -85,8 +85,8 @@ class FLambySolver(BaseSolver):
 
     def set_objective(self,
                       train_datasets,
-                      val_datasets,
                       test_datasets,
+                      is_validation,
                       model,
                       loss):
         # Define the information received by each solver from the objective.
@@ -95,8 +95,8 @@ class FLambySolver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.,
         att_names = ["train_datasets",
-                     "val_datasets",
                      "test_datasets",
+                     "is_validation",
                      "model",
                      "loss"]
 
