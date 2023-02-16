@@ -53,6 +53,7 @@ class FLambySolver(BaseSolver):
         objective = objective_list[-1][self.key_to_monitor]
 
         # We exit if one value of the objective is lower than the starting point
+        # This is a bit random but it serves as a divergence check of some sort
         delta_objective_from_start = (start_objective - objective) / start_objective
         if delta_objective_from_start < 0.:
             self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")

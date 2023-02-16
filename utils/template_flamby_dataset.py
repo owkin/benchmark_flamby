@@ -45,7 +45,6 @@ class FLambyDataset(BaseDataset):
         # For train/validation-splits and possibly dataset creation if needed
         self.seed = seed
         self.test_size = test_size
-        self.is_validation = self.test == "val"
 
     def train_test_split_datasets(self):
         # This part may vary across datasets specifically for label/RAM issues
@@ -89,6 +88,8 @@ class FLambyDataset(BaseDataset):
 
         # dataset independent part that shouldn't have to be reimplemented
         set_seed(self.seed)
+        self.is_validation = self.test == "val"
+
         self.train_datasets = [
             self.fed_dataset(i, train=True) for i in range(self.num_clients)
         ]

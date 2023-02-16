@@ -155,7 +155,7 @@ class Objective(BaseObjective):
             objective_value = average_test_loss
         else:
             objective_value = average_train_loss
-        
+
         res["value"] = objective_value
 
         return res
