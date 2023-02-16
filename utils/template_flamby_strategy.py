@@ -1,6 +1,10 @@
 from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import SufficientProgressCriterion
+
 from tqdm import tqdm
+import math
+import types
+
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -25,8 +29,55 @@ class FLambySolver(BaseSolver):
         "batch_size": [32],  # we deviate from flamby's fixed batch-size
         "num_updates": [100],
     }
-    # We basically do not stop
+
+    # We basically do not stop unless something goes terribly wrong
+    def check_convergence(self, objective_list):
+        """Check if the solver should be stopped based on the objective curve.
+        Parameters
+        ----------
+        objective_list : list of dict
+            List of dict containing the values associated to the objective at
+            each evaluated points.
+        Returns
+        -------
+        stop : bool
+            Whether or not we should stop the algorithm.
+        progress : float
+            Measure of how far the solver is from convergence.
+            This should be in [0, 1], 0 meaning no progress and 1 meaning
+            that the solver has converged.
+        """
+        # Compute the current objective and update best value
+        start_objective = objective_list[0][self.key_to_monitor]
+
+        objective = objective_list[-1][self.key_to_monitor]
+
+        # We exit if one value of the objective is lower than the starting point
+        delta_objective_from_start = (objective - start_objective) / start_objective
+        if delta_objective_from_start < 0.:
+            self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")
+            return True, 1
+
+        delta_objective = self._best_objective - objective
+        delta_objective /= abs(objective_list[0][self.key_to_monitor])
+
+        # Store only the last ``patience`` values for progress
+        self._progress.append(delta_objective)
+        if len(self._progress) > self.patience:
+            self._progress.pop(0)
+
+        delta = max(self._progress)
+        if delta <= self.eps * self._best_objective:
+            self.debug(f"Exit with delta = {delta:.2e}.")
+            return True, 1
+
+        progress = math.log(max(abs(delta), self.eps)) / math.log(self.eps)
+        return False, progress
+    
     stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
+    # We override dynamically the method of the instance, inheritance would be cleaner but
+    # I could not make it work because of pickling issues
+    stopping_criterion.check_convergence = types.MethodType(check_convergence, stopping_criterion)
 
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
