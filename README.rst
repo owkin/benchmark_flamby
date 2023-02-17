@@ -53,6 +53,7 @@ following the `example_config.yml` example config file.
 
 For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters for all strategies just launch the
 following command (note that it takes several hours to complete but can be cached):
+
 .. code-block::
    $ bash launch_validation_benchmarks.sh
 
@@ -60,17 +61,20 @@ This script should reproduce the html plot visible on the results for Fed-TCGA-B
 for each strategy.
 
 To produce the final plot on the test run:
+
 .. code-block::
    $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-TCGA-BRCA.yml
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
 find Fed-Heart-Disease's download's instructions here_.
 Then once the dataset is downloaded one can run similarly:
-For the cross-validation:
+For the validation:
+
 .. code-block::
    $ bash launch_validation_benchmarks.sh Fed-Heart-Disease
 
 For the results on the test sets:
+
 .. code-block::
    $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-Heart-Disease.yml
 
