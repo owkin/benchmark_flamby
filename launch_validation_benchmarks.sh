@@ -20,7 +20,7 @@ if [ -z "$3" ]
     OUTPUT_FOLDER=$3
 fi
 
-if [ -z "$34" ]
+if [ -z "$4" ]
   then
     TIMEOUT=360000000000
   else
