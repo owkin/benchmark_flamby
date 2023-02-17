@@ -1,0 +1,6 @@
+dataset:
+- Fed-TCGA-BRCA[seed=42,test=test,train=fl]
+max-runs: 12
+n-repetitions: 1
+solver:
+- Cyclic[batch_size=32,deterministic_cycle=True,learning_rate=0.0031622776601683794,num_updates=100]
