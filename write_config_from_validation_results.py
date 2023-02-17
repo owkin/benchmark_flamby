@@ -74,8 +74,15 @@ if __name__ == "__main__":
     new_df_final_values = new_df[idx_max_time]
 
     for s in found_strategies:
-        # We use the performance
-        best_row = new_df_final_values[new_df_final_values["strategy"] == s].sort_values(by=['objective_value'])
+        # We use the objective_value as target objective to minimize
+        sorted_results = new_df_final_values[new_df_final_values["strategy"] == s].sort_values(by=['objective_value'])
+        best_row = sorted_results.iloc[0]
+        obj_value = best_row["objective_value"]
+        avg_val_metric = best_row["objective_average_val_metric"]
+        best_hparams = best_row[pnames]
+        print(f"For strategy={s}, the best hparams: \n")
+        print(f"{best_hparams} \n")
+        print(f"give a final objective_value of {obj_value:.4f} with an average metric on val: {avg_val_metric:.4f}")
 
 
 
