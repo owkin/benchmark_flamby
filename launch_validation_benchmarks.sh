@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 if [ -z "$1" ]
   then
-    dataset=FedTcgaBrca
+    dataset=Fed-TCGA-BRCA
   else
     dataset=$1
 fi
@@ -37,4 +37,6 @@ benchopt run --max-runs $MAX_RUNS -s FedAdagrad -d $dataset --output $OUTPUT_FOL
 benchopt run --max-runs $MAX_RUNS -s FedYogi -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
 
 # Extract best hyperparameters for each strategy using final objective_value
-python write_config_from_validation_results.py -o $OUTPUT_FOLDER
+python write_config_from_validation_results.py -o $OUTPUT_FOLDER -d $dataset
+
+
