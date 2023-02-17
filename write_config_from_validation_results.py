@@ -5,7 +5,6 @@ import os
 import re
 import numpy as np
 import yaml
-from pathlib import Path
 
 
 if __name__ == "__main__":
@@ -100,13 +99,3 @@ if __name__ == "__main__":
 
     with open('best_config_test.yml', 'w') as outfile:
         yaml.dump(cfg, outfile, default_flow_style=False)
-
-
-
-
-
-
-
-
-
-
