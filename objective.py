@@ -156,7 +156,7 @@ class Objective(BaseObjective):
         else:
             objective_value = average_train_loss
 
-        # For displaying purposes we want the value to be the first one
+        # For displaying purposes we want the objective value to be the first one
         # so we add the prefix value to all keys
         for k, _ in res.copy().items():
             res["value_" + k] = res.pop(k)
