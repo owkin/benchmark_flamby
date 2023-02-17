@@ -26,63 +26,84 @@ class FLambySolver(BaseSolver):
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
         "learning_rate": [0.01],
-        "batch_size": [32],  # we deviate from flamby's fixed batch-size
+        "batch_size": [32],  # we deviate from flamby's dataset specific batch-size
         "num_updates": [100],
     }
-
-    # We basically do not stop unless something goes terribly wrong
-    def check_convergence(self, objective_list):
-        """Check if the solver should be stopped based on the objective curve.
-        Parameters
-        ----------
-        objective_list : list of dict
-            List of dict containing the values associated to the objective at
-            each evaluated points.
-        Returns
-        -------
-        stop : bool
-            Whether or not we should stop the algorithm.
-        progress : float
-            Measure of how far the solver is from convergence.
-            This should be in [0, 1], 0 meaning no progress and 1 meaning
-            that the solver has converged.
-        """
-        # Compute the current objective and update best value
-        start_objective = objective_list[0][self.key_to_monitor]
-
-        objective = objective_list[-1][self.key_to_monitor]
-
-        # We exit if one value of the objective is lower than the starting point
-        # This is a bit random but it serves as a divergence check of some sort
-        delta_objective_from_start = (start_objective - objective) / start_objective
-        if delta_objective_from_start < 0.:
-            self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")
-            return True, 1
-
-        delta_objective = self._best_objective - objective
-        delta_objective /= abs(objective_list[0][self.key_to_monitor])
-
-        # Store only the last ``patience`` values for progress
-        self._progress.append(delta_objective)
-        if len(self._progress) > self.patience:
-            self._progress.pop(0)
-
-        delta = max(self._progress)
-        if delta <= self.eps * self._best_objective:
-            self.debug(f"Exit with delta = {delta:.2e}.")
-            return True, 1
-
-        progress = math.log(max(abs(delta), self.eps)) / math.log(self.eps)
-        return False, progress
-
     stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
-    # We override dynamically the method of the instance, inheritance would be cleaner but
-    # I could not make it work because of pickling issues
-    stopping_criterion.check_convergence = types.MethodType(check_convergence, stopping_criterion)
+
+    # Ok so this is a pity because I would like my stopping criterion to have a custom
+    # check_convergence method and because of that I need to go down the rabbit hole.
+    # The way to do that cleanly would be to use class inheritance and to define another
+    # stopping_criterion class. However I cannot fix the pickling issues associated with
+    # using an inherited class no matter what I do ...
+    # Therefore I need to use one of the original Benchopt stopping_criterion classes. 
+    # Therefore I have to modify dynamically the original class's instance's check_convergence method.
+    # However to make it harder, this instance is not the one that will be called inside the run method
+    # instead another instance of the original class is used: the one created by the get_runner_instance
+    # method so I need to modify the get_runner_instance method of the original class's instance so
+    # that it produces a modified instance of class with the proper check_convergence
+    # method. This explains the following dark magic.
+
+    stopping_criterion.get_runner_instance_original = stopping_criterion.get_runner_instance
+
+    def decorated_get_runner_instance(self, *args, **kwargs):
+        res = self.get_runner_instance_original(*args, **kwargs)
+
+        def check_convergence(self, objective_list):
+            """Check if the solver should be stopped based on the objective curve.
+            Parameters
+            ----------
+            objective_list : list of dict
+                List of dict containing the values associated to the objective at
+                each evaluated points.
+            Returns
+            -------
+            stop : bool
+                Whether or not we should stop the algorithm.
+            progress : float
+                Measure of how far the solver is from convergence.
+                This should be in [0, 1], 0 meaning no progress and 1 meaning
+                that the solver has converged.
+            """
+            # Compute the current objective and update best value
+            start_objective = objective_list[0][self.key_to_monitor]
+
+            objective = objective_list[-1][self.key_to_monitor]
+
+            # We exit if one value of the objective is lower than the starting point
+            # This is a bit random but it serves as a divergence check of some sort
+            delta_objective_from_start = (start_objective - objective) / start_objective
+            if delta_objective_from_start < 0.:
+                self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")
+                return True, 1
+
+            delta_objective = self._best_objective - objective
+            delta_objective /= abs(objective_list[0][self.key_to_monitor])
+
+            # Store only the last ``patience`` values for progress
+            self._progress.append(delta_objective)
+            if len(self._progress) > self.patience:
+                self._progress.pop(0)
+
+            delta = max(self._progress)
+            if delta <= self.eps * self._best_objective:
+                self.debug(f"Exit with delta = {delta:.2e}.")
+                return True, 1
+
+            progress = math.log(max(abs(delta), self.eps)) / math.log(self.eps)
+            return False, progress
+
+        res.check_convergence = types.MethodType(check_convergence, res)
+        return res
+
+    stopping_criterion.get_runner_instance = types.MethodType(decorated_get_runner_instance, stopping_criterion)
 
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
+        # We override dynamically the method of the instance, inheritance would be cleaner but
+        # I could not make it work because of pickling issues
+        # We basically do not stop unless something goes terribly wrong
 
     def set_objective(self,
                       train_datasets,
