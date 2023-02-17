@@ -149,6 +149,9 @@ class Objective(BaseObjective):
         res["average_train_loss"] = average_train_loss
         res["average_" + test_name + "_loss"] = average_test_loss
 
+        # Important for display purposes, this way averages are displayed first
+        sorted_res = {key: value for key, value in sorted(res.items())}
+
         # Very important because of check_convergence that operates on val if is_validation
         # or on train
         if self.is_validation:
@@ -156,14 +159,16 @@ class Objective(BaseObjective):
         else:
             objective_value = average_train_loss
 
-        # For displaying purposes we want the objective value to be the first one
-        # so we add the prefix value to all keys
-        for k, _ in res.copy().items():
-            res["value_" + k] = res.pop(k)
+        keys_list = list(sorted_res.keys())
 
-        res["value"] = objective_value
+        # We add the value that is used in convergence_check in the first place so that it
+        # appears by default and the rest of the values are sorted in the clickable list
+        new_res = {}
+        new_res["value"] = objective_value
+        for k in keys_list:
+            new_res[k] = sorted_res.pop(k)
 
-        return res
+        return new_res
 
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible
