@@ -4,12 +4,16 @@ import argparse
 import os
 import re
 import numpy as np
+import yaml
+from pathlib import Path
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Gather results and extract best hyperparameters for each strategy')
     parser.add_argument('--output-folder', "-o", type=str,  help="Path to directory containing validation results.", default=".")
+    parser.add_argument('--dataset', "-d", type=str,  help="The FLamby dataset on which to test.", default="Fed-TCGA-BRCA")
+
     args = parser.parse_args()
 
     # Find all results parquet files
@@ -73,6 +77,12 @@ if __name__ == "__main__":
     # This way we keep only the final-value which we will be able to use to filter the dataframe
     new_df_final_values = new_df[idx_max_time]
 
+    cfg = {}
+    cfg["n-repetitions"] = 1
+    cfg["max-runs"] = 12
+    # We will be testing on Test Now
+    cfg["dataset"] = [args.dataset + "[seed=42,test=test,train=fl]"]
+
     for s in found_strategies:
         # We use the objective_value as target objective to minimize
         sorted_results = new_df_final_values[new_df_final_values["strategy"] == s].sort_values(by=['objective_value'])
@@ -83,6 +93,13 @@ if __name__ == "__main__":
         print(f"For strategy={s}, the best hparams: \n")
         print(f"{best_hparams} \n")
         print(f"give a final objective_value of {obj_value:.4f} with an average metric on val: {avg_val_metric:.4f}")
+        if "solver" in cfg:
+            cfg["solver"].append(best_row["solver_name"])
+        else:
+            cfg["solver"] = [best_row["solver_name"]]
+
+    with open('best_config_test.yml', 'w') as outfile:
+        yaml.dump(cfg, outfile, default_flow_style=False)
 
 
 
