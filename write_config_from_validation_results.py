@@ -56,7 +56,7 @@ if __name__ == "__main__":
                     if not (param_value_list[0].lower() in ["true", "false"]):
                         raise ValueError
                     else:
-                        return (param_value_list[0] == "true")
+                        return (param_value_list[0].lower() == "true")
                 except ValueError:
                     raise ValueError(f"{param_value_list[0]} cannot be converted to float or boolean")
         else:
@@ -65,10 +65,11 @@ if __name__ == "__main__":
     for pn in pnames:
         new_df[pn] = [number_or_nan_filler(e, pn) for e in new_df["solver_name"].tolist()]
 
-    # We look for a specific hpset note that we could also use solver_name
+    # We look for a specific hpset (note that we could also use solver_name)
     groupby_cols = ["strategy"] + pnames
     # We look at final performance to choose best hyperparameters
     idx_max_time = new_df.groupby(groupby_cols)['time'].transform(max) == new_df['time']
+    assert (idx_max_time != (new_df.groupby(["solver_name"])["time"].transform(max) == new_df["time"])).sum() == 0
     # This way we keep only the final-value which we will be able to use to filter the dataframe
     new_df_final_values = new_df[idx_max_time]
 
