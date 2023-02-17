@@ -36,7 +36,7 @@ First go to Flamby_ and install it using the following commands (see the API Doc
    $ pip install -e ".[all_extra]" # Note that the all_extra option installs all dependencies for all 7 datasets
 
 This benchmark can then be run on Fed-TCGA-BRCA's validation sets using the following commands, which will launch
-a grid-search on all parameters found in utils/common.py for the FederatedAveraging strategy:
+a grid-search on all parameters found in `utils/common.py` for the FederatedAveraging strategy:
 
 .. code-block::
    $ pip install -U benchopt
