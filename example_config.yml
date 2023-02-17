@@ -1,0 +1,6 @@
+dataset:
+- Fed-TCGA-BRCA[seed=42,test=val,train=fl]
+max-runs: 12
+n-repetitions: 1
+solver:
+- FedProx[batch_size=32,learning_rate=0.0031622776601683794,mu=0.01]

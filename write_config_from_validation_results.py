@@ -12,6 +12,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Gather results and extract best hyperparameters for each strategy')
     parser.add_argument('--output-folder', "-o", type=str,  help="Path to directory containing validation results.", default=".")
     parser.add_argument('--dataset', "-d", type=str,  help="The FLamby dataset on which to test.", default="Fed-TCGA-BRCA")
+    parser.add_argument('--seed', "-s", type=int, help="The seed for the dataset", default=42)
+
 
     args = parser.parse_args()
 
@@ -24,8 +26,11 @@ if __name__ == "__main__":
     for i, pq in enumerate(pq_files_list):
         new_dfs_list.append(pd.read_parquet(pq))
 
-    # Gather results
+    # Gather all results
     new_df = pd.concat(new_dfs_list, ignore_index=True)
+
+    # For the right dataset
+    new_df = new_df[new_df["data_name"] == (args.dataset + f"[seed={args.seed},test=val,train=fl]")]
 
     # Create startegy column
     new_df["strategy"] = [re.findall("[a-zA-Z].+(?=\[)", e)[0] for e in new_df["solver_name"].tolist()]
@@ -97,5 +102,5 @@ if __name__ == "__main__":
         else:
             cfg["solver"] = [best_row["solver_name"]]
 
-    with open('best_config_test.yml', 'w') as outfile:
+    with open(f'best_config_test_{args.dataset}.yml', 'w') as outfile:
         yaml.dump(cfg, outfile, default_flow_style=False)

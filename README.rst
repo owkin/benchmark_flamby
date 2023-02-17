@@ -35,33 +35,44 @@ First go to Flamby_ and install it using the following commands (see the API Doc
    $ conda activate benchmark_flamby
    $ pip install -e ".[all_extra]" # Note that the all_extra option installs all dependencies for all 7 datasets
 
-This benchmark can then be run on Fed-TCGA-BRCA for a specific learning rate using the following commands:
+This benchmark can then be run on Fed-TCGA-BRCA's validation sets using the following commands, which will launch
+a grid-search on all parameters found in utils/common.py for the FederatedAveraging strategy:
 
 .. code-block::
    $ pip install -U benchopt
    $ cd ..
    $ git clone https://github.com/owkin/benchmark_flamby
    $ cd benchmark_flamby
-   $ benchopt run --timeout 36000000000 --max-runs 12 -s FederatedAveraging -learning-rate 0.001 -d FedTcgaBrca
+   $ benchopt run --timeout 36000000000 --max-runs 12 -s FederatedAveraging -d Fed-TCGA-BRCA
 
-For the whole benchmark on Fed-Tcga-Brca, here is how to reproduce the cross-validation:
-.. code-block::
-   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedTcgaBrca
+To test a specific value of hyper-parameters just fill a yaml config file with the appropriate hyper-parameters for each solver
+following the `example_config.yml` example config file.
 
-And here is how to obtain the results of the best parameters from the cross-validation on the test sets:
 .. code-block::
-   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedTcgaBrca
+   $ benchopt run --config ./example_config.yml
+
+For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters for all strategies just launch the
+following command (note that it takes several hours to complete but can be cached):
+.. code-block::
+   $ bash launch_validation_benchmarks.sh
+
+This script should reproduce the html plot visible on the results for Fed-TCGA-BRCA and produce a config with all best validation hyper-parameters
+for each strategy.
+
+To produce the final plot on the test run:
+.. code-block::
+   $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-TCGA-BRCA.yml
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
 find Fed-Heart-Disease's download's instructions here_.
 Then once the dataset is downloaded one can run similarly:
 For the cross-validation:
 .. code-block::
-   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedHeartDisease
+   $ bash launch_validation_benchmarks.sh Fed-Heart-Disease
 
 For the results on the test sets:
 .. code-block::
-   $ benchopt run --timeout 36000000000 --max-runs 12 -d FedHeartDisease
+   $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-Heart-Disease.yml
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
