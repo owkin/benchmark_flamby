@@ -27,8 +27,6 @@ class Dataset(FLambyDataset):
     # Any parameters 'param' defined here is available as `self.param`.
     parameters = {"train": ["fl"], "test": ["val"], "seed": [42]}
 
-
-
     def __init__(self, *args, **kwargs):
         super().__init__(
             fed_dataset=FedDataset,
