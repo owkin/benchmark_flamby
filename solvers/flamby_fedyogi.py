@@ -11,7 +11,6 @@ with safe_import_context() as import_ctx:
     slrs = import_ctx.import_from("common", "slrs")
 
 
-
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class Solver(FLambySolver):
