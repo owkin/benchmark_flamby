@@ -52,12 +52,13 @@ class FLambySolver(BaseSolver):
         res = self.get_runner_instance_original(*args, **kwargs)
 
         def check_convergence(self, objective_list):
-            """Check if the solver should be stopped based on the objective curve.
+            """Check if the solver should be stopped based on the objective
+            curve.
             Parameters
             ----------
             objective_list : list of dict
-                List of dict containing the values associated to the objective at
-                each evaluated points.
+                List of dict containing the values associated to the objective
+                at each evaluated points.
             Returns
             -------
             stop : bool
@@ -104,7 +105,8 @@ class FLambySolver(BaseSolver):
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = strategy
-        # We override dynamically the method of the instance, inheritance would be cleaner but
+        # We override dynamically the method of the instance, inheritance
+        # would be cleaner but
         # I could not make it work because of pickling issues
         # We basically do not stop unless something goes terribly wrong
 
@@ -133,7 +135,8 @@ class FLambySolver(BaseSolver):
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations (max_runs * 10)
+        # It runs the algorithm for a given a number of iterations
+        # (max_runs * 10)
 
         self.train_dls = [
             dl(train_d, self.batch_size) for train_d in self.train_datasets
