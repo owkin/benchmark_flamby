@@ -1,7 +1,6 @@
 from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import SufficientProgressCriterion
 
-from tqdm import tqdm
 import math
 import types
 
@@ -26,25 +25,28 @@ class FLambySolver(BaseSolver):
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
         "learning_rate": [0.01],
-        "batch_size": [32],  # we deviate from flamby's dataset specific batch-size
+        "batch_size": [32],  # we deviate from flamby's dataset specific batch-size  # noqa: E501
         "num_updates": [100],
     }
-    stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")
+    stopping_criterion = SufficientProgressCriterion(patience=100000000, strategy="callback")   # noqa: E501
 
-    # Ok so this is a pity because I would like my stopping criterion to have a custom
-    # check_convergence method and because of that I need to go down the rabbit hole.
-    # The way to do that cleanly would be to use class inheritance and to define another
-    # stopping_criterion class. However I cannot fix the pickling issues associated with
-    # using an inherited class no matter what I do ...
-    # Therefore I need to use one of the original Benchopt stopping_criterion classes. 
-    # Therefore I have to modify dynamically the original class's instance's check_convergence method.
-    # However to make it harder, this instance is not the one that will be called inside the run method
-    # instead another instance of the original class is used: the one created by the get_runner_instance
-    # method so I need to modify the get_runner_instance method of the original class's instance so
-    # that it produces a modified instance of class with the proper check_convergence
-    # method. This explains the following dark magic.
+    # Ok so this is a pity because I would like my stopping criterion to
+    # have a custom check_convergence method and because of that I need to
+    # go down the rabbit hole. The way to do that cleanly would be to use
+    # class inheritance and to define another stopping_criterion class.
+    # However I cannot fix the pickling issues associated with using an
+    # inherited class no matter what I do ...
+    # Therefore I need to use one of the original Benchopt stopping_criterion
+    # classes. Thus I have to modify dynamically the original class's
+    # instance's check_convergence method. However to make it harder, this
+    # instance is not the one that will be called inside the run method
+    # instead another instance of the original class is used: the one
+    # created by the get_runner_instance method so I need to modify the
+    # get_runner_instance method of the original class's instance so
+    # that it produces a modified instance of class with the proper
+    # check_convergence method. This explains the following dark magic.
 
-    stopping_criterion.get_runner_instance_original = stopping_criterion.get_runner_instance
+    stopping_criterion.get_runner_instance_original = stopping_criterion.get_runner_instance   # noqa: E501
 
     def decorated_get_runner_instance(self, *args, **kwargs):
         res = self.get_runner_instance_original(*args, **kwargs)
@@ -70,11 +72,12 @@ class FLambySolver(BaseSolver):
 
             objective = objective_list[-1][self.key_to_monitor]
 
-            # We exit if one value of the objective is lower than the starting point
-            # This is a bit random but it serves as a divergence check of some sort
-            delta_objective_from_start = (start_objective - objective) / start_objective
+            # We exit if one value of the objective is lower than the
+            # starting point. This is a bit random but it serves as a
+            # divergence check of some sort
+            delta_objective_from_start = (start_objective - objective) / start_objective    # noqa: E501
             if delta_objective_from_start < 0.:
-                self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")
+                self.debug(f"Exit with delta from start = {delta_objective_from_start:.2e}.")   # noqa: E501
                 return True, 1
 
             delta_objective = self._best_objective - objective
@@ -96,7 +99,7 @@ class FLambySolver(BaseSolver):
         res.check_convergence = types.MethodType(check_convergence, res)
         return res
 
-    stopping_criterion.get_runner_instance = types.MethodType(decorated_get_runner_instance, stopping_criterion)
+    stopping_criterion.get_runner_instance = types.MethodType(decorated_get_runner_instance, stopping_criterion)    # noqa: E501
 
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -143,11 +146,12 @@ class FLambySolver(BaseSolver):
             SGD,
             self.learning_rate,
             self.num_updates,
-            nrounds=-100, # It won't be used anyway as we do not call the run method
+            nrounds=-100,  # It won't be used anyway as we do not call the run method   # noqa: E501
             **self.strategy_specific_args
         )
-        # We are reproducing the run method but this time a callback checks stopping-criterion
-        # at each round, which allows to cache computations and do a single run
+        # We are reproducing the run method but this time a callback checks
+        # stopping-criterion at each round, which allows to cache computations
+        # and do a single run
         while callback(strat.models_list[0].model):
             strat.perform_round()
 

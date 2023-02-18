@@ -76,10 +76,10 @@ class FLambyDataset(BaseDataset):
         ]
 
         self.test_datasets = self.val_datasets
-        # The pooled train and test datasets change because now they are both a part of the pooled train
+        # The pooled train and test datasets change because now they are both
+        # a part of the pooled train
         self.pooled_train_dataset = ConcatDataset(self.train_datasets)
         self.pooled_test_dataset = ConcatDataset(self.test_datasets)
-
 
     def get_data(self):
         # The return arguments of this function are passed as keyword arguments
@@ -119,10 +119,6 @@ class FLambyDataset(BaseDataset):
 
         else:
             raise ValueError()
-
-
-
-
 
         # ! The metric depends on the dataset it has to be passed to the
         # objective, same for loss and model
