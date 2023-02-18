@@ -73,7 +73,7 @@ class Objective(BaseObjective):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
-            dl(test_d, self.batch_size_test, shuffle=False) for test_d in self.test_datasets
+            dl(test_d, self.batch_size_test, shuffle=False) for test_d in self.test_datasets  # noqa: E501
         ]
 
         def robust_metric(y_true, y_pred):
@@ -91,7 +91,7 @@ class Objective(BaseObjective):
         res = evaluate_model_on_tests(model, test_dls, robust_metric)
 
         # Evaluation on the pooled test set
-        pooled_res_value = evaluate_model_on_tests(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]
+        pooled_res_value = evaluate_model_on_tests(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]  # noqa: E501
 
         # We do not take into account clients where metric is not defined
         # nd use the average metric across clients as the default benchopt
@@ -138,7 +138,7 @@ class Objective(BaseObjective):
 
         # We compute average loss on test if it doesn't exist already
         if len(self.test_datasets) > 1:
-            pooled_test_loss = self.compute_avg_loss_on_client(model, self.pooled_test_dataset)
+            pooled_test_loss = self.compute_avg_loss_on_client(model, self.pooled_test_dataset)  # noqa: E501
         else:
             pooled_test_loss = res[test_name + "_loss_client_0"]
 
