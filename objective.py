@@ -60,7 +60,7 @@ class Objective(BaseObjective):
         set_seed(self.seed)
         self.model = self.model_arch()
 
-    def compute_average_loss_on_client(self, model, dataset):
+    def compute_avg_loss_on_client(self, model, dataset):
         average_loss = 0.0
         count_batch = 0
         for X, y in dl(dataset, self.batch_size_test, shuffle=False):
@@ -79,7 +79,7 @@ class Objective(BaseObjective):
         def robust_metric(y_true, y_pred):
             try:
                 return self.metric(y_true, y_pred)
-            except:
+            except ValueError:
                 return np.nan
 
         if self.is_validation:
@@ -93,8 +93,9 @@ class Objective(BaseObjective):
         # Evaluation on the pooled test set
         pooled_res_value = evaluate_model_on_tests(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]
 
-        # We do not take into account clients where metric is not defined and use the average metric across clients as the default benchopt metric "value"
-        # Note that we weigh all clients equally
+        # We do not take into account clients where metric is not defined
+        # nd use the average metric across clients as the default benchopt
+        # metric "value". Note that we weigh all clients equally
         average_metric = 0.0
         nb_clients_nan = 0
         skip_clients = []
@@ -113,29 +114,31 @@ class Objective(BaseObjective):
 
         res["pooled_" + test_name + "_metric"] = pooled_res_value
 
-        # We also compute average losses on batches on the different clients both on test and train
+        # We also compute average losses on batches on the different clients
+        # both on test and train
         average_test_loss = 0.0
         average_train_loss = 0.0
         for idx, (train_d, test_d) in enumerate(
             zip_longest(self.train_datasets, self.test_datasets)
         ):
             if train_d is not None:
-                single_client_train_loss = self.compute_average_loss_on_client(model, train_d)
-                res[f"train_loss_client_{idx}"] = single_client_train_loss
-                average_train_loss += single_client_train_loss
+                cl_train_loss = self.compute_avg_loss_on_client(model, train_d)
+                res[f"train_loss_client_{idx}"] = cl_train_loss
+                average_train_loss += cl_train_loss
 
-            # If metrics is not defined then the test loss should not be computed
+            # If metrics is not defined then the test loss should not be
+            # computed
             if idx in skip_clients:
                 continue
 
             if test_d is not None:
-                single_client_test_loss = self.compute_average_loss_on_client(model, test_d)
-                res[test_name + f"_loss_client_{idx}"] = single_client_test_loss
-                average_test_loss += single_client_test_loss
+                cl_test_loss = self.compute_avg_loss_on_client(model, test_d)
+                res[test_name + f"_loss_client_{idx}"] = cl_test_loss
+                average_test_loss += cl_test_loss
 
         # We compute average loss on test if it doesn't exist already
         if len(self.test_datasets) > 1:
-            pooled_test_loss = self.compute_average_loss_on_client(model, self.pooled_test_dataset)
+            pooled_test_loss = self.compute_avg_loss_on_client(model, self.pooled_test_dataset)
         else:
             pooled_test_loss = res[test_name + "_loss_client_0"]
 
@@ -152,8 +155,8 @@ class Objective(BaseObjective):
         # Important for display purposes, this way averages are displayed first
         sorted_res = {key: value for key, value in sorted(res.items())}
 
-        # Very important because of check_convergence that operates on val if is_validation
-        # or on train
+        # Very important because of check_convergence that operates on val
+        # if is validation or on train
         if self.is_validation:
             objective_value = average_test_loss
         else:
@@ -161,8 +164,9 @@ class Objective(BaseObjective):
 
         keys_list = list(sorted_res.keys())
 
-        # We add the value that is used in convergence_check in the first place so that it
-        # appears by default and the rest of the values are sorted in the clickable list
+        # We add the value that is used in convergence_check in the first
+        # place so that it appears by default and the rest of the values are
+        # sorted in the clickable list
         new_res = {}
         new_res["value"] = objective_value
         for k in keys_list:
