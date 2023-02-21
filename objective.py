@@ -79,7 +79,7 @@ class Objective(BaseObjective):
         def robust_metric(y_true, y_pred):
             try:
                 return self.metric(y_true, y_pred)
-            except ValueError:
+            except (ValueError, ZeroDivisionError):
                 return np.nan
 
         if self.is_validation:
