@@ -27,7 +27,6 @@ Install
 -------
 
 First go to Flamby_ and install it using the following commands (see the API Doc_ if needed):
-
 .. code-block::
    $ git clone https://github.com/owkin/FLamby.git
    $ cd FLamby
@@ -37,7 +36,6 @@ First go to Flamby_ and install it using the following commands (see the API Doc
 
 This benchmark can then be run on Fed-TCGA-BRCA's validation sets using the following commands, which will launch
 a grid-search on all parameters found in `utils/common.py` for the FederatedAveraging strategy:
-
 .. code-block::
    $ pip install -U benchopt
    $ cd ..
@@ -47,13 +45,11 @@ a grid-search on all parameters found in `utils/common.py` for the FederatedAver
 
 To test a specific value of hyper-parameters just fill a yaml config file with the appropriate hyper-parameters for each solver
 following the `example_config.yml` example config file.
-
 .. code-block::
    $ benchopt run --config ./example_config.yml
 
 For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters for all strategies just launch the
 following command (note that it takes several hours to complete but can be cached):
-
 .. code-block::
    $ bash launch_validation_benchmarks.sh
 
@@ -61,7 +57,6 @@ This script should reproduce the html plot visible on the results for Fed-TCGA-B
 for each strategy.
 
 To produce the final plot on the test run:
-
 .. code-block::
    $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-TCGA-BRCA.yml
 
@@ -69,12 +64,10 @@ To benchmark on other datasets of FLamby, follow FLamby's instructions to downlo
 find Fed-Heart-Disease's download's instructions here_.
 Then once the dataset is downloaded one can run similarly:
 For the validation:
-
 .. code-block::
    $ bash launch_validation_benchmarks.sh Fed-Heart-Disease
 
 For the results on the test sets:
-
 .. code-block::
    $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-Heart-Disease.yml
 
