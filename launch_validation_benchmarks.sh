@@ -28,15 +28,15 @@ if [ -z "$4" ]
 fi
 
 # Perform validation runs on all parameters defined in common.py
-benchopt run --max-runs $MAX_RUNS -s FederatedAveraging -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s Cyclic -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s FedProx -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s Scaffold -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s FedAdam -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s FedAdagrad -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
-benchopt run --max-runs $MAX_RUNS -s FedYogi -d $dataset --output $OUTPUT_FOLDER --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s FederatedAveraging -d $dataset --output fedavg --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s Cyclic -d $dataset --output cyclic --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s FedProx -d $dataset --output fedprox --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s Scaffold -d $dataset --output scaffold --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s FedAdam -d $dataset --output fedadam--timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s FedAdagrad -d $dataset --output fedadagrad --timeout $TIMEOUT
+benchopt run --max-runs $MAX_RUNS -s FedYogi -d $dataset --output fedyogi --timeout $TIMEOUT
 
 # Extract best hyperparameters for each strategy using final objective_value
-python write_config_from_validation_results.py -o $OUTPUT_FOLDER -d $dataset
+python write_config_from_validation_results.py -o . -d $dataset
 
 
