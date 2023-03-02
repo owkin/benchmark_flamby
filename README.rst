@@ -19,7 +19,7 @@ $$\\max_{\\theta} \\sum_{k=0}^{K} m(f_{\\theta}(X_{k}), y_{k})$$
 
 where $K$ stands for the number of clients participating in the
 Federated Learning training, $p$ (or ``n_features``) stands for the number of features
-, $ \\theta $ the parameters of the model of dimension $N$,
+, :math:`\theta` the parameters of the model of dimension $N$,
 $$X \\in \\mathbb{R}^{n \\times p} \\ , \\quad \\theta \\in \\mathbb{R}^N$$
 and $m$, the metric of interest.
 To ease comparison, we fix the number of local updates to 100 and the maximum number of rounds
