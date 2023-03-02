@@ -5,6 +5,7 @@ from torch.utils.data import ConcatDataset
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import torch
     from flamby.benchmarks.benchmark_utils import set_seed
     from torch.utils.data import Subset
     from sklearn.model_selection import train_test_split
@@ -57,11 +58,10 @@ class FLambyDataset(BaseDataset):
 
         self.trainval_indices_list = []
         for e, size in zip(self.train_datasets, self.train_sizes):
-            split_kw["arrays"] = range(size)
             if self.stratify_func is not None:
-                split_kw["stratify"] = [self.stratify_func(e[i]) for i in range(size)]
+                split_kw["stratify"] = torch.stack([self.stratify_func(e[i]) for i in range(size)]).numpy().astype("uint8")
 
-            current_train_test_split = train_test_split(**split_kw)
+            current_train_test_split = train_test_split(range(size), **split_kw)
             self.trainval_indices_list.append(current_train_test_split)
 
         # We start by creating val_datasets as we will be replacing original
