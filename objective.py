@@ -10,9 +10,8 @@ with safe_import_context() as import_ctx:
     from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.utils import evaluate_model_on_tests
     from torch.utils.data import DataLoader as dl
-    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks, FedLidcIdri
+    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks, FedLidcIdri  # noqa: E501
     from flamby.datasets.fed_kits19 import evaluate_dice_on_tests, FedKits19
-
 
 
 # The benchmark objective must be named `Objective` and
