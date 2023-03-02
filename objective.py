@@ -19,7 +19,7 @@ with safe_import_context() as import_ctx:
 class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
-    name = "FLamby Average Metric across clients"
+    name = "FLamby losses and metrics"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
