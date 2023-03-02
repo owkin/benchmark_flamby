@@ -141,7 +141,7 @@ class FLambySolver(BaseSolver):
         # (max_runs * 10)
 
         self.train_dls = [
-            dl(train_d, self.batch_size, collate_fn=self.collate_fn) for train_d in self.train_datasets
+            dl(train_d, self.batch_size, collate_fn=self.collate_fn) for train_d in self.train_datasets   # noqa: E501
         ]
         self.set_strategy_specific_args()
         strat = self.strategy(

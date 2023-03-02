@@ -54,16 +54,16 @@ class FLambyDataset(BaseDataset):
     def train_test_split_datasets(self):
         # This part may vary across datasets specifically for label/RAM issues
         # here we separate for each client a validation
-        # set while stratifying wrt the target variable, in this case
-        # censorship. Therefore one could have to reimplement it
+        # set while stratifying wrt the target variable if the stratify_func
+        # was given
         split_kw = {"test_size": self.test_size, "random_state": self.seed}
 
         self.trainval_indices_list = []
         for e, size in zip(self.train_datasets, self.train_sizes):
             if self.stratify_func is not None:
-                split_kw["stratify"] = torch.stack([self.stratify_func(e[i]) for i in range(size)]).numpy().astype("uint8")
+                split_kw["stratify"] = torch.stack([self.stratify_func(e[i]) for i in range(size)]).numpy().astype("uint8")   # noqa: E501
 
-            current_train_test_split = train_test_split(range(size), **split_kw)
+            current_train_test_split = train_test_split(range(size), **split_kw)   # noqa: E501
             self.trainval_indices_list.append(current_train_test_split)
 
         # We start by creating val_datasets as we will be replacing original
