@@ -5,6 +5,7 @@ Benchmarking FL strategies on FLamby with benchopt
 
 .. image:: https://github.com/owkin/FLamby/blob/main/docs/logo.png
    :scale: 50%
+   :width: 50px
    :target: https://owkin.github.io/FLamby/
 
 This benchmark is dedicated to tuning cross-silo FL strategies on Flamby_'s datasets.
