@@ -23,7 +23,7 @@ Federated Learning training, $p$ (or ``n_features``) stands for the number of fe
 $$X \\in \\mathbb{R}^{n \\times p} \\ , \\quad \\theta \\in \\mathbb{R}^N$$
 and $m$, the metric of interest.
 To ease comparison, we fix the number of local updates to 100 and the maximum number of rounds
-to 12.
+to 120 (12*10).
 
 **Try to beat the FLamby by adding your own solver !**  
 
@@ -79,7 +79,8 @@ To produce the final plot on the test run:
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
 find Fed-Heart-Disease's download's instructions here_.
-Then once the dataset is downloaded one can run the same commands changing the dataset argument i.e.:
+Then once the dataset is downloaded one can run the same commands changing the dataset argument i.e.:  
+
 For the validation:
 
 .. code-block::
