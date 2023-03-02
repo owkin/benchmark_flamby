@@ -135,7 +135,7 @@ class FLambySolver(BaseSolver):
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations
+        # It runs the algorithm for a given a number of rounds
         # (max_runs * 10)
 
         self.train_dls = [
