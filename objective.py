@@ -10,6 +10,9 @@ with safe_import_context() as import_ctx:
     from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.utils import evaluate_model_on_tests
     from torch.utils.data import DataLoader as dl
+    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks, FedLidcIdri
+    from flamby.datasets.fed_kits19 import evaluate_dice_on_tests, FedKits19
+
 
 
 # The benchmark objective must be named `Objective` and
@@ -62,6 +65,18 @@ class Objective(BaseObjective):
         set_seed(self.seed)
         self.model = self.model_arch()
 
+        # Small boilerplate for datasets that require custom evaluation
+        if isinstance(self.train_datasets[0], FedLidcIdri):
+            def evaluate_func(m, test_dls, metric):
+                return evaluate_dice_on_tests_by_chunks(m, test_dls)
+            self.eval = evaluate_func
+
+        elif isinstance(self.train_datasets[0], FedKits19):
+            def evaluate_func(m, test_dls, metric):
+                return evaluate_dice_on_tests(m, test_dls, metric)
+            self.eval = evaluate_func
+        self.eval = evaluate_model_on_tests
+
     def compute_avg_loss_on_client(self, model, dataset):
         average_loss = 0.0
         count_batch = 0
@@ -90,10 +105,10 @@ class Objective(BaseObjective):
             test_name = "test"
 
         # Evaluation on the different test sets
-        res = evaluate_model_on_tests(model, test_dls, robust_metric)
+        res = self.eval(model, test_dls, robust_metric)
 
         # Evaluation on the pooled test set
-        pooled_res_value = evaluate_model_on_tests(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]  # noqa: E501
+        pooled_res_value = self.eval(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]  # noqa: E501
 
         # We do not take into account clients where metric is not defined
         # nd use the average metric across clients as the default benchopt
