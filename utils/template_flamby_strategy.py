@@ -113,6 +113,7 @@ class FLambySolver(BaseSolver):
     def set_objective(self,
                       train_datasets,
                       test_datasets,
+                      collate_fn,
                       is_validation,
                       model,
                       loss):
@@ -123,6 +124,7 @@ class FLambySolver(BaseSolver):
         # It is customizable for each benchmark.,
         att_names = ["train_datasets",
                      "test_datasets",
+                     "collate_fn",
                      "is_validation",
                      "model",
                      "loss"]
@@ -139,7 +141,7 @@ class FLambySolver(BaseSolver):
         # (max_runs * 10)
 
         self.train_dls = [
-            dl(train_d, self.batch_size) for train_d in self.train_datasets
+            dl(train_d, self.batch_size, collate_fn=self.collate_fn) for train_d in self.train_datasets
         ]
         self.set_strategy_specific_args()
         strat = self.strategy(

@@ -38,6 +38,7 @@ class Objective(BaseObjective):
         loss,
         num_clients,
         batch_size_test,
+        collate_fn,
     ):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
@@ -52,6 +53,7 @@ class Objective(BaseObjective):
             "loss",
             "num_clients",
             "batch_size_test",
+            "collate_fn",
         ]
         for att in att_names:
             setattr(self, att, eval(att))
@@ -73,7 +75,7 @@ class Objective(BaseObjective):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
-            dl(test_d, self.batch_size_test, shuffle=False) for test_d in self.test_datasets  # noqa: E501
+            dl(test_d, self.batch_size_test, shuffle=False, collate_fn=self.collate_fn) for test_d in self.test_datasets  # noqa: E501
         ]
 
         def robust_metric(y_true, y_pred):
@@ -188,6 +190,7 @@ class Objective(BaseObjective):
         return dict(
             train_datasets=self.train_datasets,
             test_datasets=self.test_datasets,
+            collate_fn=self.collate_fn,
             is_validation=self.is_validation,
             model=self.model,
             loss=self.loss,

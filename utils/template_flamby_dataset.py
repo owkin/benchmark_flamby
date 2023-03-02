@@ -32,6 +32,7 @@ class FLambyDataset(BaseDataset):
         seed=42,
         test_size=0.2,
         stratify_func=None,
+        collate_fn=None,
         *args,
         **kwargs
     ):
@@ -48,6 +49,7 @@ class FLambyDataset(BaseDataset):
         self.seed = seed
         self.test_size = test_size
         self.stratify_func = stratify_func
+        self.collate_fn = collate_fn
 
     def train_test_split_datasets(self):
         # This part may vary across datasets specifically for label/RAM issues
@@ -138,4 +140,5 @@ class FLambyDataset(BaseDataset):
             loss=self.loss(),
             num_clients=self.num_clients,
             batch_size_test=self.batch_size_test,
+            collate_fn=self.collate_fn,
         )
