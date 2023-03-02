@@ -25,7 +25,8 @@ and $m$, the metric of interest.
 To ease comparison, we fix the number of local updates to 100 and the maximum number of rounds
 to 12.
 
-**Try to beat the FLamby by adding your own solver !**
+**Try to beat the FLamby by adding your own solver !**  
+
 You can even use most python FL-frameworks such as substra_ or FedBioMed_ to build your solver !
 
 
@@ -60,8 +61,8 @@ following the `example_config.yml` example config file.
 
    $ benchopt run --config ./example_config.yml
 
-For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters for all strategies just launch the
-following command (note that it takes several hours to complete but can be cached):  
+For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters of the grid for all strategies.
+To reproduce results just launch the following command (note that it takes several hours to complete but can be cached):  
 
 .. code-block::
 
@@ -78,8 +79,8 @@ To produce the final plot on the test run:
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
 find Fed-Heart-Disease's download's instructions here_.
-Then once the dataset is downloaded one can run similarly:
-For the validation:  
+Then once the dataset is downloaded one can run the same commands changing the dataset argument i.e.:
+For the validation:
 
 .. code-block::
 
@@ -89,7 +90,7 @@ For the results on the test sets:
 
 .. code-block::
 
-   $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-Heart-Disease.yml
+   $ benchopt run --timeout 36000000000 --config ./best_config_found_for_heart_disease.yml
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
