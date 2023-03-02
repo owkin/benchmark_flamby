@@ -30,6 +30,7 @@ class FLambyDataset(BaseDataset):
         metric,
         seed=42,
         test_size=0.2,
+        stratify_func=None,
         *args,
         **kwargs
     ):
@@ -45,23 +46,26 @@ class FLambyDataset(BaseDataset):
         # For train/validation-splits and possibly dataset creation if needed
         self.seed = seed
         self.test_size = test_size
+        self.stratify_func = stratify_func
 
     def train_test_split_datasets(self):
         # This part may vary across datasets specifically for label/RAM issues
         # here we separate for each client a validation
         # set while stratifying wrt the target variable, in this case
         # censorship. Therefore one could have to reimplement it
-        self.trainval_indices_list = [
-            train_test_split(
-                range(size),
-                test_size=self.test_size,
-                stratify=[float(e[i][1][0]) for i in range(size)],
-                random_state=self.seed,
-            )
-            for e, size in zip(self.train_datasets, self.train_sizes)
-        ]
+        split_kw = {"test_size": self.test_size, "random_state": self.seed}
 
-        # We start by val_datasets as we are replacing train datasets
+        self.trainval_indices_list = []
+        for e, size in zip(self.train_datasets, self.train_sizes):
+            split_kw["arrays"] = range(size)
+            if self.stratify_func is not None:
+                split_kw["stratify"] = [self.stratify_func(e[i]) for i in range(size)]
+
+            current_train_test_split = train_test_split(**split_kw)
+            self.trainval_indices_list.append(current_train_test_split)
+
+        # We start by creating val_datasets as we will be replacing original
+        # train datasets with their trimmed versions
         self.val_datasets = [
             Subset(e, trainval_indices[1])
             for e, trainval_indices in zip(
