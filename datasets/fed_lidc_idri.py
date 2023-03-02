@@ -5,13 +5,12 @@ from benchopt import safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from flamby.datasets.fed_camelyon16 import FedCamelyon16 as FedDataset
-    from flamby.datasets.fed_camelyon16 import (
+    from flamby.datasets.fed_lidc_idri import FedLidcIdri as FedDataset
+    from flamby.datasets.fed_lidc_idri import (
         metric,
         NUM_CLIENTS,
         Baseline,
         BaselineLoss,
-        collate_fn,
     )
     template_file_name = "template_flamby_dataset"
     FLambyDataset = import_ctx.import_from(template_file_name, "FLambyDataset")
@@ -21,7 +20,7 @@ with safe_import_context() as import_ctx:
 class Dataset(FLambyDataset):
 
     # Name to select the dataset in the CLI and to display the results.
-    name = "Fed-Camelyon16"
+    name = "Fed-LIDC-IDRI"
 
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
@@ -30,9 +29,6 @@ class Dataset(FLambyDataset):
 
     def __init__(self, *args, **kwargs):
 
-        def stratify_on_y(sample):
-            return sample[1]
-
         super().__init__(
             fed_dataset=FedDataset,
             model_arch=Baseline,
@@ -40,8 +36,6 @@ class Dataset(FLambyDataset):
             num_clients=NUM_CLIENTS,
             metric=metric,
             test_size=0.25,
-            collate_fn=collate_fn,
-            stratify_func=stratify_on_y,
             *args,
             **kwargs
         )
