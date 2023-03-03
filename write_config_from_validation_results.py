@@ -5,6 +5,7 @@ import os
 import re
 import numpy as np
 import yaml
+from datetime import datetime
 
 
 if __name__ == "__main__":
@@ -23,7 +24,9 @@ if __name__ == "__main__":
     strategies = {}
     new_dfs_list = []
     for i, pq in enumerate(pq_files_list):
-        new_dfs_list.append(pd.read_parquet(pq))
+        cdf = pd.read_parquet(pq)
+        print(cdf["solver_name"].unique())
+        new_dfs_list.append(cdf)
 
     # Gather all results
     new_df = pd.concat(new_dfs_list, ignore_index=True)
@@ -53,7 +56,7 @@ if __name__ == "__main__":
 
     # helper function used just below
     def number_or_nan_filler(cell_value, name):
-        param_value_list = re.findall("(?<=" + name + "=)([a-zA-Z-0-9]+[.]?[0-9]*)", cell_value)   # noqa: E501  W605
+        param_value_list = re.findall("(?<=" + "," + name + "=)([a-zA-Z-0-9]+[.]?[0-9]*)", cell_value)   # noqa: E501  W605
         if len(param_value_list) > 0:
             assert len(param_value_list) == 1
             # We currently can match all hyperparams either floats or boolean
@@ -73,10 +76,11 @@ if __name__ == "__main__":
     for pn in pnames:
         new_df[pn] = [number_or_nan_filler(e, pn) for e in new_df["solver_name"].tolist()]   # noqa: E501
 
-    # We look for a specific hpset (note that we could also use solver_name)
+    # We look for a specific hpset (note that we could also use solver_name
+    # indeed we will make the equivalence explicit with an assert)
     groupby_cols = ["strategy"] + pnames
     # We look at final performance to choose best hyperparameters
-    idx_max_time = new_df.groupby(groupby_cols)['time'].transform(max) == new_df['time']   # noqa: E501
+    idx_max_time = new_df.groupby(groupby_cols, dropna=False)['time'].transform(max) == new_df['time']   # noqa: E501
     assert (idx_max_time != (new_df.groupby(["solver_name"])["time"].transform(max) == new_df["time"])).sum() == 0   # noqa: E501
     # This way we keep only the final-value which we will be able to use
     # to filter the dataframe
@@ -86,7 +90,7 @@ if __name__ == "__main__":
     cfg["n-repetitions"] = 1
     cfg["max-runs"] = 12
     # We will be testing on Test Now
-    cfg["dataset"] = [args.dataset + "[seed=42,test=test,train=fl]"]
+    cfg["dataset"] = [args.dataset + f"[seed={args.seed},test=test,train=fl]"]
 
     for s in found_strategies:
         # We use the objective_value as target objective to minimize
@@ -103,5 +107,6 @@ if __name__ == "__main__":
         else:
             cfg["solver"] = [best_row["solver_name"]]
 
-    with open(f'best_config_test_{args.dataset}.yml', 'w') as outfile:
+    date = str(datetime.now())
+    with open(f'{date}_best_config_test_{args.dataset}.yml', 'w') as outfile:
         yaml.dump(cfg, outfile, default_flow_style=False)
