@@ -1,14 +1,13 @@
 from benchopt import safe_import_context
 
+from benchmark_utils.common import lrs, mus
+from benchmark_utils.template_flamby_strategy import FLambySolver
+
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from flamby.strategies import FedProx
-    template_file_name = "template_flamby_strategy"
-    FLambySolver = import_ctx.import_from(template_file_name, "FLambySolver")
-    lrs = import_ctx.import_from("common", "lrs")
-    mus = import_ctx.import_from("common", "mus")
 
 
 # The benchmark solvers must be named `Solver` and

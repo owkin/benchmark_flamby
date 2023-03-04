@@ -1,17 +1,20 @@
-from benchopt import BaseObjective, safe_import_context
-import numpy as np
 import re
 from itertools import zip_longest
+
+from benchopt import BaseObjective, safe_import_context
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from flamby.benchmarks.benchmark_utils import set_seed
-    from flamby.utils import evaluate_model_on_tests
+    import numpy as np
     from torch.utils.data import DataLoader as dl
-    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks, FedLidcIdri  # noqa: E501
+
+    from flamby.utils import evaluate_model_on_tests
+    from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.datasets.fed_kits19 import evaluate_dice_on_tests, FedKits19
+    from flamby.datasets.fed_lidc_idri import FedLidcIdri
+    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks
 
 
 # The benchmark objective must be named `Objective` and
@@ -19,11 +22,17 @@ with safe_import_context() as import_ctx:
 class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
-    name = "FLamby losses and metrics"
+    name = "FLamby"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.seed = 42
+    # Make it easy to install the benchmark
+    install_cmd = 'conda'
+    requirements = [
+        "pip:git+https://github.com/owkin/FLamby#egg=flamby[all_extra]"
+    ]
+
+    parameters = {
+        'seed': [42],
+    }
 
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
