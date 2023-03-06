@@ -1,14 +1,15 @@
 from benchopt import BaseDataset, safe_import_context
-from torch.utils.data import ConcatDataset
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import torch
-    from flamby.benchmarks.benchmark_utils import set_seed
     from torch.utils.data import Subset
+    from torch.utils.data import ConcatDataset
     from sklearn.model_selection import train_test_split
+
+    from flamby.benchmarks.benchmark_utils import set_seed
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`

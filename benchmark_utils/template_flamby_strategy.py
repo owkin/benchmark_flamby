@@ -1,8 +1,8 @@
-from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import SufficientProgressCriterion
-
 import math
 import types
+
+from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 
 # Protect the import with `safe_import_context()`. This allows:

@@ -1,4 +1,5 @@
 from benchopt import safe_import_context
+from benchmark_utils.template_flamby_dataset import FLambyDataset
 
 
 # Protect the import with `safe_import_context()`. This allows:
@@ -13,8 +14,6 @@ with safe_import_context() as import_ctx:
         BaselineLoss,
         collate_fn,
     )
-    template_file_name = "template_flamby_dataset"
-    FLambyDataset = import_ctx.import_from(template_file_name, "FLambyDataset")
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`
