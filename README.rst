@@ -27,7 +27,7 @@ to 120 (12*10).
 
 **Try to beat the FLamby by adding your own solver !**  
 
-You can even use most python FL-frameworks such as substra_ or FedBioMed_ to build your solver !
+You can even use your favorite python FL-frameworks such as substra_ or FedBioMed_ to build your solver !
 
 
 Install
