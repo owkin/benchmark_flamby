@@ -27,6 +27,9 @@ class Objective(BaseObjective):
     and Flamby metrics per dataset and globally.
     This way we can compare per-dataset metric vs averaged metrics across
     datasets and global metric when datasets are pooled.
+    The objective_value is the average train or test loss across datasets
+    this depends on wether we use the validation datasets or the test
+    ones.
 
 
     Parameters
