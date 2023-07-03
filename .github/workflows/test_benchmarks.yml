@@ -69,11 +69,13 @@ jobs:
         else
           pip install -U benchopt==$BENCHOPT_VERSION
         fi
+  
     - name: FLamby
       run: |
          git clone https://github.com/owkin/FLamby.git
          cd FLamby
          pip install -e "[all_extra]"
+   
     - name: Test
       run: |
         benchopt test . --env-name bench_test_env -vl
