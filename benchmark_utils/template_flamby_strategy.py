@@ -27,8 +27,11 @@ class FLambySolver(BaseSolver):
         ],  # we deviate from flamby's dataset specific batch-size  # noqa: E501
         "num_updates": [100],
     }
-    # We avoid running solvers that overshoot the initial value of the objective
-    stopping_criterion = CustomSPC(patience=100000000, strategy="callback")  # noqa: E501
+    # We avoid running solvers that overshoot the initial
+    # value of the objective
+    stopping_criterion = CustomSPC(
+        patience=100000000, strategy="callback"
+    )  # noqa: E501
 
     def __init__(self, strategy, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,7 +42,13 @@ class FLambySolver(BaseSolver):
         # We basically do not stop unless something goes terribly wrong
 
     def set_objective(
-        self, train_datasets, test_datasets, collate_fn, is_validation, model, loss
+        self,
+        train_datasets,
+        test_datasets,
+        collate_fn,
+        is_validation,
+        model,
+        loss,  # noqa: E501
     ):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
