@@ -22,7 +22,7 @@ fi
 
 if [ -z "$4" ]
   then
-    TIMEOUT=360000000000
+    TIMEOUT=72h
   else
     TIMEOUT=$4
 fi
