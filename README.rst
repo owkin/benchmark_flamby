@@ -52,7 +52,7 @@ a grid-search on all parameters found in `utils/common.py` for the FederatedAver
    $ cd ..
    $ git clone https://github.com/owkin/benchmark_flamby
    $ cd benchmark_flamby
-   $ benchopt run --timeout 36000000000 --max-runs 12 -s FederatedAveraging -d Fed-TCGA-BRCA
+   $ benchopt run --timeout 24h --max-runs 12 -s FederatedAveraging -d Fed-TCGA-BRCA
 
 To test a specific value of hyper-parameters just fill a yaml config file with the appropriate hyper-parameters for each solver
 following the `example_config.yml` example config file.  
@@ -91,7 +91,7 @@ For the results on the test sets:
 
 .. code-block::
 
-   $ benchopt run --timeout 36000000000 --config ./best_config_found_for_heart_disease.yml
+   $ benchopt run --timeout 24h --config ./best_config_found_for_heart_disease.yml
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
