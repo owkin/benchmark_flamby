@@ -2,6 +2,6 @@ dataset:
 - Fed-TCGA-BRCA[seed=42,test=val,train=fl]
 max-runs: 12
 n-repetitions: 1
-timeout: 36000000000
+timeout: 24h
 solver:
 - FederatedAveraging[batch_size=32,learning_rate=0.031622776601683794]
