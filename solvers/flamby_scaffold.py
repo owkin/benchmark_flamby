@@ -13,6 +13,25 @@ with safe_import_context() as import_ctx:
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class Solver(FLambySolver):
+    """Implement the Scaffold FL strategy.
+
+    By adding auxiliary variables or control variates (c) in the
+    clients and server the authors of the related paper prove better
+    bounds on the convergence assuming certain
+    hypothesis. FLamby implements a faster version of Scaffold.
+    The details can be found in FLamby.
+
+    Parameters
+    ----------
+    FLambySolver : FlambySolver
+        We define a common interface for all strategies implemented
+        in FLamby.
+
+    References
+    ----------
+    - https://arxiv.org/abs/1910.06378
+
+    """
 
     # Name to select the solver in the CLI and to display the results.
     name = "Scaffold"
@@ -23,9 +42,7 @@ class Solver(FLambySolver):
     parameters = {
         "learning_rate": lrs,
         "server_learning_rate": slrs,
-        "batch_size": [
-            32
-        ],
+        "batch_size": [32],
         "num_updates": [100],
     }
 
@@ -33,6 +50,4 @@ class Solver(FLambySolver):
         super().__init__(strategy=Scaffold, *args, **kwargs)
 
     def set_strategy_specific_args(self):
-        self.strategy_specific_args = {
-            "server_learning_rate": self.server_learning_rate
-        }
+        self.strategy_specific_args = {"server_learning_rate": self.server_learning_rate}

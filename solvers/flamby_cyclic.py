@@ -13,6 +13,22 @@ with safe_import_context() as import_ctx:
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class Solver(FLambySolver):
+    """Implement the Cyclic and RandomWalk "FL" strategies.
+
+    This solver uses FLamby's implementation of the Cyclical
+    weight transfer, which is successively fine-tuning a model.
+
+    Parameters
+    ----------
+    FLambySolver : FlambySolver
+        We define a common interface for all strategies implemented
+        in FLamby.
+
+    References
+    ----------
+    - https://pubmed.ncbi.nlm.nih.gov/29617797/
+
+    """
 
     # Name to select the solver in the CLI and to display the results.
     name = "Cyclic"
@@ -22,9 +38,7 @@ class Solver(FLambySolver):
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
         "learning_rate": lrs,
-        "batch_size": [
-            32
-        ],
+        "batch_size": [32],
         "num_updates": [100],
         "deterministic_cycle": [True, False],
     }

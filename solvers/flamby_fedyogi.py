@@ -13,6 +13,23 @@ with safe_import_context() as import_ctx:
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class Solver(FLambySolver):
+    """Implement the FedYogi FL strategy.
+
+    This solver uses FLamby's implementation of the federation
+    of the Yogi solver as described in Reddi et al. 2020.
+
+    Parameters
+    ----------
+    FLambySolver : FlambySolver
+        We define a common interface for all strategies implemented
+        in FLamby.
+
+    References
+    ----------
+    - https://papers.nips.cc/paper_files/paper/2018/hash/90365351ccc7437a1309dc64e4db32a3-Abstract.html  # noqa: E501
+    - https://arxiv.org/abs/2003.00295
+
+    """
 
     # Name to select the solver in the CLI and to display the results.
     name = "FedYogi"
@@ -23,9 +40,7 @@ class Solver(FLambySolver):
     parameters = {
         "learning_rate": lrs,
         "server_learning_rate": slrs,
-        "batch_size": [
-            32
-        ],
+        "batch_size": [32],
         "tau": [1e-8],
         "beta1": [0.9],
         "beta2": [0.999],
