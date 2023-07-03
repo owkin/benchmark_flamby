@@ -2,4 +2,4 @@
 # the benchmark objective, datasets, and solvers. The folder should have the
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
-from .stopping_criteria import CustomSPC
+from .stopping_criteria import CustomSPC  # noqa: F401
