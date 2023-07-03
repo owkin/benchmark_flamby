@@ -1,0 +1,21 @@
+repos:
+-   repo: https://github.com/ambv/black
+    rev: 22.1.0
+    hooks:
+    - id: black
+      additional_dependencies: ['click==8.0.4']
+      args: # arguments to configure black
+       - --line-length=89
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v1.2.3
+    hooks:
+    - id: flake8
+      args: # arguments to configure flake8
+       - "--max-line-length=89"
+       - "--per-file-ignores=*/__init__.py:F401"
+
+-   repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+    - id: isort
+      args : ["--profile", "black", "--filter-files"]
