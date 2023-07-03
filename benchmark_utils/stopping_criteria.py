@@ -37,8 +37,8 @@ class CustomSPC(SufficientProgressCriterion):
         ) / start_objective  # noqa: E501
         if delta_objective_from_start < 0.0:
             self.debug(
-                f"Exit with delta from start = {delta_objective_from_start:.2e}."
-            )  # noqa: E501
+                f"Exit with delta from start = {delta_objective_from_start:.2e}."  # noqa: E501
+            )
             return True, 1
 
         delta_objective = self._best_objective - objective

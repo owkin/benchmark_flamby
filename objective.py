@@ -8,30 +8,45 @@ from benchopt import BaseObjective, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import numpy as np
-    from torch.utils.data import DataLoader as dl
-
-    from flamby.utils import evaluate_model_on_tests
     from flamby.benchmarks.benchmark_utils import set_seed
-    from flamby.datasets.fed_kits19 import evaluate_dice_on_tests, FedKits19
-    from flamby.datasets.fed_lidc_idri import FedLidcIdri
-    from flamby.datasets.fed_lidc_idri import evaluate_dice_on_tests_by_chunks
+    from flamby.datasets.fed_kits19 import FedKits19, evaluate_dice_on_tests
+    from flamby.datasets.fed_lidc_idri import (
+        FedLidcIdri,
+        evaluate_dice_on_tests_by_chunks,
+    )
+    from flamby.utils import evaluate_model_on_tests
+    from torch.utils.data import DataLoader as dl
 
 
 # The benchmark objective must be named `Objective` and
 # inherit from `BaseObjective` for `benchopt` to work properly.
 class Objective(BaseObjective):
+    """Compute per-client and global metrics and losses.
+
+    This objective computes several metrics of interests based on FLamby losses
+    and Flamby metrics per dataset and globally.
+    This way we can compare per-dataset metric vs averaged metrics across
+    datasets and global metric when datasets are pooled.
+
+
+    Parameters
+    ----------
+    BaseObjective : BaseObjective
+        The base objective in BenchOpt
+
+    """
 
     # Name to select the objective in the CLI and to display the results.
     name = "FLamby"
 
     # Make it easy to install the benchmark
-    install_cmd = 'conda'
+    install_cmd = "conda"
     requirements = [
         "pip:git+https://github.com/owkin/FLamby#egg=flamby[all_extra]"
     ]
 
     parameters = {
-        'seed': [42],
+        "seed": [42],
     }
 
     # Minimal version of benchopt required to run this benchmark.
@@ -75,13 +90,17 @@ class Objective(BaseObjective):
 
         # Small boilerplate for datasets that require custom evaluation
         if isinstance(self.train_datasets[0], FedLidcIdri):
+
             def evaluate_func(m, test_dls, metric):
                 return evaluate_dice_on_tests_by_chunks(m, test_dls)
+
             self.eval = evaluate_func
 
         elif isinstance(self.train_datasets[0], FedKits19):
+
             def evaluate_func(m, test_dls, metric):
                 return evaluate_dice_on_tests(m, test_dls, metric)
+
             self.eval = evaluate_func
         else:
             self.eval = evaluate_model_on_tests
@@ -99,7 +118,13 @@ class Objective(BaseObjective):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
-            dl(test_d, self.batch_size_test, shuffle=False, collate_fn=self.collate_fn) for test_d in self.test_datasets  # noqa: E501
+            dl(
+                test_d,
+                self.batch_size_test,
+                shuffle=False,
+                collate_fn=self.collate_fn,
+            )
+            for test_d in self.test_datasets  # noqa: E501
         ]
 
         def robust_metric(y_true, y_pred):
@@ -117,7 +142,19 @@ class Objective(BaseObjective):
         res = self.eval(model, test_dls, robust_metric)
 
         # Evaluation on the pooled test set
-        pooled_res_value = self.eval(model, [dl(self.pooled_test_dataset, self.batch_size_test, shuffle=False)], robust_metric)["client_test_0"]  # noqa: E501
+        pooled_res_value = self.eval(
+            model,
+            [
+                dl(
+                    self.pooled_test_dataset,
+                    self.batch_size_test,
+                    shuffle=False,
+                )
+            ],
+            robust_metric,
+        )[
+            "client_test_0"
+        ]  # noqa: E501
 
         # We do not take into account clients where metric is not defined
         # nd use the average metric across clients as the default benchopt
@@ -164,7 +201,9 @@ class Objective(BaseObjective):
 
         # We compute average loss on test if it doesn't exist already
         if len(self.test_datasets) > 1:
-            pooled_test_loss = self.compute_avg_loss_on_client(model, self.pooled_test_dataset)  # noqa: E501
+            pooled_test_loss = self.compute_avg_loss_on_client(
+                model, self.pooled_test_dataset
+            )  # noqa: E501
         else:
             pooled_test_loss = res[test_name + "_loss_client_0"]
 

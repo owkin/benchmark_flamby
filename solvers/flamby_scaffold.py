@@ -50,4 +50,6 @@ class Solver(FLambySolver):
         super().__init__(strategy=Scaffold, *args, **kwargs)
 
     def set_strategy_specific_args(self):
-        self.strategy_specific_args = {"server_learning_rate": self.server_learning_rate}
+        self.strategy_specific_args = {
+            "server_learning_rate": self.server_learning_rate
+        }  # noqa: E501
