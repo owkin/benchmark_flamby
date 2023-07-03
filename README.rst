@@ -75,7 +75,7 @@ To produce the final plot on the test run:
 
 .. code-block::
 
-   $ benchopt run --timeout 36000000000 --config ./best_config_test_Fed-TCGA-BRCA.yml
+   $ benchopt run --timeout 24h --config ./best_config_test_Fed-TCGA-BRCA.yml
 
 To benchmark on other datasets of FLamby, follow FLamby's instructions to download each dataset, for example you can
 find Fed-Heart-Disease's download's instructions here_.
