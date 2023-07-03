@@ -61,6 +61,13 @@ following the `example_config.yml` example config file.
 
    $ benchopt run --config ./example_config.yml
 
+Or use directly the CLI:
+
+.. code-block::
+
+   $ benchopt run -s FederatedAveraging[batch_size=32,learning_rate=0.031622776601683794]
+
+
 For the whole benchmark on Fed-TCGA-BRCA we successively run all hyper-parameters of the grid for all strategies.
 To reproduce results just launch the following command (note that it takes several hours to complete but can be cached):  
 
