@@ -36,7 +36,7 @@ class Objective(BaseObjective):
 
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
-    min_benchopt_version = "1.3"
+    min_benchopt_version = "1.4"
 
     def set_data(
         self,
@@ -83,7 +83,8 @@ class Objective(BaseObjective):
             def evaluate_func(m, test_dls, metric):
                 return evaluate_dice_on_tests(m, test_dls, metric)
             self.eval = evaluate_func
-        self.eval = evaluate_model_on_tests
+        else:
+            self.eval = evaluate_model_on_tests
 
     def compute_avg_loss_on_client(self, model, dataset):
         average_loss = 0.0
