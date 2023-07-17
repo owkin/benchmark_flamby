@@ -8,6 +8,8 @@ from benchopt import BaseObjective, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import numpy as np
+    import torch
+    import gc
     from flamby.benchmarks.benchmark_utils import set_seed
     from flamby.datasets.fed_kits19 import FedKits19, evaluate_dice_on_tests
     from flamby.datasets.fed_lidc_idri import (
@@ -90,16 +92,19 @@ class Objective(BaseObjective):
         # We init the model
         set_seed(self.seed)
         self.model = self.model_arch()
-
         # Small boilerplate for datasets that require custom evaluation
-        if isinstance(self.train_datasets[0], FedLidcIdri):
+        if hasattr(train_datasets[0], "dataset"):
+            check_dataset = train_datasets[0].dataset
+        else:
+            check_dataset = train_datasets[0]
+        if isinstance(check_dataset, FedLidcIdri):
 
             def evaluate_func(m, test_dls, metric):
                 return evaluate_dice_on_tests_by_chunks(m, test_dls)
 
             self.eval = evaluate_func
 
-        elif isinstance(self.train_datasets[0], FedKits19):
+        elif isinstance(check_dataset, FedKits19):
 
             def evaluate_func(m, test_dls, metric):
                 return evaluate_dice_on_tests(m, test_dls, metric)
@@ -112,8 +117,12 @@ class Objective(BaseObjective):
         average_loss = 0.0
         count_batch = 0
         for X, y in dl(dataset, self.batch_size_test, shuffle=False):
+            if torch.cuda.is_available():
+                X = X.cuda()
+                y = y.cuda()
             average_loss += self.loss(model(X), y).item()
             count_batch += 1
+        del X, y
         average_loss /= float(count_batch)
         return average_loss
 
@@ -240,6 +249,8 @@ class Objective(BaseObjective):
         for k in keys_list:
             new_res[k] = sorted_res.pop(k)
 
+        gc.collect()
+        torch.cuda.empty_cache()
         return new_res
 
     def get_one_solution(self):
