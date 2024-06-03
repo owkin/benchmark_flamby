@@ -14,6 +14,10 @@ on:
     # Run every day at 7:42am UTC.
     - cron:  '42 7 * * *'
 
+
+env:
+  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+
 jobs:
   benchopt_dev:
     uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
