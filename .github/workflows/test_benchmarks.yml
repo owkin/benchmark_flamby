@@ -30,6 +30,7 @@ jobs:
       BENCHOPT_DEBUG: 1
       BENCHOPT_CONDA_CMD: mamba
       SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+      PYTEST_EXTRA_ARGS: ""
 
     defaults:
       run:
@@ -73,9 +74,13 @@ jobs:
       run: |
          git clone https://github.com/owkin/FLamby.git
          cd FLamby
-         pip install -e ".[all_extra]"
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -e ."[all_extra]"
    
     - name: Test
       run: |
-        benchopt test .
-        benchopt test . --skip-install
+        benchopt test . --env-name bench_test_env -vl $PYTEST_EXTRA_ARGS
+        # Avoid having too large cache between two runs
+        benchopt clean .
+        benchopt test . --env-name bench_test_env -vl --skip-install $PYTEST_EXTRA_ARGS
