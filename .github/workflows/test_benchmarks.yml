@@ -25,7 +25,7 @@ jobs:
           - os: ${{ inputs.benchopt_version == 'git' || 'macos-latest' }}
     env:
       CONDA_ENV: 'test_env'
-      BENCHOPT_BRANCH: main
+      BENCHOPT_BRANCH: benchopt@main
       BENCHOPT_VERSION: git
       BENCHOPT_DEBUG: 1
       BENCHOPT_CONDA_CMD: mamba
