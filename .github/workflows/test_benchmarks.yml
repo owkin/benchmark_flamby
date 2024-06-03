@@ -73,7 +73,7 @@ jobs:
       run: |
          git clone https://github.com/owkin/FLamby.git
          cd FLamby
-         pip install -e "[all_extra]"
+         pip install -e ".[all_extra]"
    
     - name: Test
       run: |
