@@ -16,6 +16,10 @@ on:
         required: false
         type: string
 
+env:
+  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+
+
 jobs:
   test-benchmark:
     runs-on: ${{ matrix.os }}
