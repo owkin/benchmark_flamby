@@ -126,7 +126,7 @@ class Objective(BaseObjective):
         average_loss /= float(count_batch)
         return average_loss
 
-    def compute(self, model):
+    def evaluate_result(self, model):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         test_dls = [
@@ -253,7 +253,7 @@ class Objective(BaseObjective):
         torch.cuda.empty_cache()
         return new_res
 
-    def get_one_solution(self):
+    def get_one_result(self):
         # Return one solution. The return value should be an object compatible
         # with `self.compute`. This is mainly for testing purposes.
         return self.model_arch()

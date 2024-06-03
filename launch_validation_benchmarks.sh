@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 if [ -z "$1" ]
   then
-    dataset=Fed-TCGA-BRCA
+    dataset=Fed-Camelyon16
   else
     dataset=$1
 fi
