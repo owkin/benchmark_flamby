@@ -25,8 +25,8 @@ jobs:
           - os: ${{ inputs.benchopt_version == 'git' || 'macos-latest' }}
     env:
       CONDA_ENV: 'test_env'
-      BENCHOPT_BRANCH: ${{ inputs.benchopt_branch }}
-      BENCHOPT_VERSION: ${{ inputs.benchopt_version }}
+      BENCHOPT_BRANCH: main
+      BENCHOPT_VERSION: git
       BENCHOPT_DEBUG: 1
       BENCHOPT_CONDA_CMD: mamba
       SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
