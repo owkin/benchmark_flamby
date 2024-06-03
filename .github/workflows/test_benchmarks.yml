@@ -82,5 +82,5 @@ jobs:
    
     - name: Test
       run: |
-        benchopt test . --env-name bench_test_env -vl
-        benchopt test . --env-name bench_test_env -vl --skip-install
+        benchopt test .
+        benchopt test . --skip-install
