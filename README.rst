@@ -13,8 +13,9 @@ This benchmark is dedicated to tuning cross-silo FL strategies on Flamby_'s data
 The goal is to maximize the average metric across clients using each provided model
 on the val/test clients:
 
+.. math::
 
-$$\\max_{\\theta} \\sum_{k=0}^{K} m(f_{\\theta}(X_{k}), y_{k})$$
+    \max_{\theta} \sum_{k=0}^{K} m(f_{\theta}(X_{k}), y_{k})
 
 
 where $K$ stands for the number of clients participating in the
@@ -124,7 +125,53 @@ Use ``benchopt run -h`` for more details about these options, or visit https://b
 FAQ
 ---
 .. code-block::
+  Collecting sklearn (from nnunet==1.7.0->flamby==0.0.1)
+  Downloading sklearn-0.0.post12.tar.gz (2.6 kB)
+  Preparing metadata (setup.py) ... error
+  error: subprocess-exited-with-error
+  
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [15 lines of output]
+      The 'sklearn' PyPI package is deprecated, use 'scikit-learn'
+      rather than 'sklearn' for pip commands.
+      
+      Here is how to fix this error in the main use cases:
+      - use 'pip install scikit-learn' rather than 'pip install sklearn'
+      - replace 'sklearn' by 'scikit-learn' in your pip requirements files
+        (requirements.txt, setup.py, setup.cfg, Pipfile, etc ...)
+      - if the 'sklearn' package is used by one of your dependencies,
+        it would be great if you take some time to track which package uses
+        'sklearn' instead of 'scikit-learn' and report it to their issue tracker
+      - as a last resort, set the environment variable
+        SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True to avoid this error
+      
+      More information is available at
+      https://github.com/scikit-learn/sklearn-pypi-package
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+      error: metadata-generation-failed
+
+    × Encountered error while generating package metadata.
+    ╰─> See above for output.
+    
+    note: This is an issue with the package mentioned above, not pip.
+    hint: See above for details.
+
+Unfortunately some of flamby dependencies still rely on old sklearn versions
+see `sklearn doc <https://github.com/scikit-learn/sklearn-pypi-package/>`_. about ways to fix it.
+So one way is to set the SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL environment variable to True.
+On Linux do:
+
+.. code-block::
+
+   $ export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+
+.. code-block::
+
    $ ModuleNotFoundError: No module named 'flamby.whatever' 
+
 
 Make sure that benchopt CLI uses the right Python interpreter. 
 To do that one might have to do `conda init bash` to put conda path in the PATH.
