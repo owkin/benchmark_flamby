@@ -96,16 +96,32 @@ class FLambyDataset(BaseDataset):
         # dataset independent part that shouldn't have to be reimplemented
         set_seed(self.seed)
         self.is_validation = self.test == "val"
+        try:
+            self.train_datasets = [
+                self.fed_dataset(i, train=True) for i in range(self.num_clients)
+            ]
+            self.train_sizes = [len(d) for d in self.train_datasets]
+            self.test_datasets = [
+                self.fed_dataset(i, train=False) for i in range(self.num_clients)
+            ]
+            self.pooled_train_dataset = self.fed_dataset(train=True, pooled=True)
+            self.pooled_test_dataset = self.fed_dataset(train=False, pooled=True)
 
-        self.train_datasets = [
-            self.fed_dataset(i, train=True) for i in range(self.num_clients)
-        ]
-        self.train_sizes = [len(d) for d in self.train_datasets]
-        self.test_datasets = [
-            self.fed_dataset(i, train=False) for i in range(self.num_clients)
-        ]
-        self.pooled_train_dataset = self.fed_dataset(train=True, pooled=True)
-        self.pooled_test_dataset = self.fed_dataset(train=False, pooled=True)
+        except ValueError:
+            # so that the CI can run wo downloading any dataset
+            return dict(
+            train_datasets=[],
+            test_datasets=[],
+            is_validation=self.is_validation,
+            pooled_test_dataset=None,
+            model_arch=self.model_arch,
+            metric=self.metric,
+            loss=self.loss(),
+            num_clients=self.num_clients,
+            batch_size_test=self.batch_size_test,
+            collate_fn=self.collate_fn,
+        )
+
 
         if self.train == "pooled":
             self.train_datasets = [self.pooled_train_dataset]
