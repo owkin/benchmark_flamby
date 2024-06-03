@@ -93,8 +93,10 @@ class FLambySolver(BaseSolver):
         # We are reproducing the run method but this time a callback checks
         # stopping-criterion at each round, which allows to cache computations
         # and do a single run
-        while callback(strat.models_list[0].model):
+        self.final_model = strat.models_list[0].model
+        while callback():
             strat.perform_round()
+            self.final_model = strat.models_list[0].model
 
         self.final_model = strat.models_list[0].model
 
@@ -103,7 +105,7 @@ class FLambySolver(BaseSolver):
         # The outputs of this function are the arguments of `Objective.compute`
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
-        return self.final_model
+        return {"model": self.final_model}
 
     # Not used if callback is used
     @staticmethod

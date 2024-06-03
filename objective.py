@@ -256,7 +256,7 @@ class Objective(BaseObjective):
     def get_one_result(self):
         # Return one solution. The return value should be an object compatible
         # with `self.compute`. This is mainly for testing purposes.
-        return self.model_arch()
+        return dict(model=self.model_arch())
 
     def get_objective(self):
         # Define the information to pass to each solver to run the benchmark.
