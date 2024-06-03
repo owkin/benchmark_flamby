@@ -150,16 +150,16 @@ FAQ
       [end of output]
   
   note: This error originates from a subprocess, and is likely not a problem with pip.
-error: metadata-generation-failed
+      error: metadata-generation-failed
 
-× Encountered error while generating package metadata.
-╰─> See above for output.
-
-note: This is an issue with the package mentioned above, not pip.
-hint: See above for details.
+    × Encountered error while generating package metadata.
+    ╰─> See above for output.
+    
+    note: This is an issue with the package mentioned above, not pip.
+    hint: See above for details.
 
 Unfortunately some of flamby dependencies still rely on old sklearn versions
-see https://github.com/scikit-learn/sklearn-pypi-package.
+see _doc about fixing it.
 So one way is to set the SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL environment variable to True.
 On Linux do:
 
@@ -171,3 +171,5 @@ On Linux do:
 
 Make sure that benchopt CLI uses the right Python interpreter. 
 To do that one might have to do `conda init bash` to put conda path in the PATH.
+
+.. _doc: https://github.com/scikit-learn/sklearn-pypi-package
