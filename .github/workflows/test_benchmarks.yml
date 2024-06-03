@@ -1,24 +1,18 @@
 name: Test Benchmark
 
 on:
-  workflow_call:
-    inputs:
-      benchopt_branch:
-        description: Branch of benchopt to install to test the benchmark.
-        default: benchopt@main
-        required: false
-        type: string
-      benchopt_version:
-        description: |
-          If set, use a specific version of benchopt for the tests,
-          thus ignoring the benchopt_branch input.
-        default: git
-        required: false
-        type: string
-
-env:
-  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
-
+  push:
+    branches:
+      - main
+  create:
+    tags:
+      - '**'
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run every day at 7:42am UTC.
+    - cron:  '42 7 * * *'
 
 jobs:
   test-benchmark:
@@ -35,6 +29,7 @@ jobs:
       BENCHOPT_VERSION: ${{ inputs.benchopt_version }}
       BENCHOPT_DEBUG: 1
       BENCHOPT_CONDA_CMD: mamba
+      SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
 
     defaults:
       run:
