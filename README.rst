@@ -159,7 +159,7 @@ FAQ
     hint: See above for details.
 
 Unfortunately some of flamby dependencies still rely on old sklearn versions
-see _sklearndoc about ways to fix it.
+see `sklearn doc <https://github.com/scikit-learn/sklearn-pypi-package/>`_. about ways to fix it.
 So one way is to set the SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL environment variable to True.
 On Linux do:
 
@@ -174,5 +174,3 @@ On Linux do:
 
 Make sure that benchopt CLI uses the right Python interpreter. 
 To do that one might have to do `conda init bash` to put conda path in the PATH.
-
-.. _sklearndoc: https://github.com/scikit-learn/sklearn-pypi-package
