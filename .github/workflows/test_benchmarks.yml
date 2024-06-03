@@ -80,7 +80,7 @@ jobs:
    
     - name: Test
       run: |
-        benchopt test . --env-name bench_test_env -vl $PYTEST_EXTRA_ARGS
+        benchopt test . --env-name test_env -vl $PYTEST_EXTRA_ARGS
         # Avoid having too large cache between two runs
         benchopt clean .
-        benchopt test . --env-name bench_test_env -vl --skip-install $PYTEST_EXTRA_ARGS
+        benchopt test . --env-name test_env -vl --skip-install $PYTEST_EXTRA_ARGS
