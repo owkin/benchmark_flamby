@@ -3,8 +3,6 @@ from itertools import zip_longest
 
 from benchopt import BaseObjective, safe_import_context
 
-import os
-os.environ["SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL"] = "1"
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
