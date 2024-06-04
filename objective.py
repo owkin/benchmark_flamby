@@ -116,7 +116,7 @@ class Objective(BaseObjective):
     def compute_avg_loss_on_client(self, model, dataset):
         average_loss = 0.0
         count_batch = 0
-        for X, y in dl(dataset, self.batch_size_test, shuffle=False):
+        for X, y in dl(dataset, self.batch_size_test, shuffle=False, collate_fn=self.collate_fn):
             if torch.cuda.is_available():
                 X = X.cuda()
                 y = y.cuda()
@@ -161,6 +161,7 @@ class Objective(BaseObjective):
                     self.pooled_test_dataset,
                     self.batch_size_test,
                     shuffle=False,
+                    collate_fn=self.collate_fn,
                 )
             ],
             robust_metric,
