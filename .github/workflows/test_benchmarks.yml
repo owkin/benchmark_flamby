@@ -77,7 +77,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           pip install -e ."[all_extra]"
-          python ./flamby/datasets/fed_synthetic/dataset_creation_scripts/download.py --output-folder ./synthetic
+          python ./flamby/datasets/fed_synthetic/dataset_creation_scripts/download.py --output-folder ./synthetic --classification
 
 
     - name: Test
