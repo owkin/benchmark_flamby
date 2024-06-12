@@ -1,0 +1,12 @@
+dataset:
+- Fed-TCGA-BRCA[seed=42,test=test,train=fl]
+max-runs: 12
+n-repetitions: 1
+solver:
+- FedAdam[batch_size=32,beta1=0.9,beta2=0.999,learning_rate=0.001,num_updates=100,server_learning_rate=0.001,tau=1e-08]
+- FedAdagrad[batch_size=32,beta1=0.9,beta2=0.999,learning_rate=0.001,num_updates=100,server_learning_rate=0.03162277660168379,tau=1e-08]
+- FederatedAveraging[batch_size=32,learning_rate=0.01,num_updates=100]
+- Cyclic[batch_size=32,deterministic_cycle=True,learning_rate=0.0031622776601683794,num_updates=100]
+- FedProx[batch_size=32,learning_rate=0.01,mu=1.0,num_updates=100]
+- FedYogi[batch_size=32,beta1=0.9,beta2=0.999,learning_rate=0.001,num_updates=100,server_learning_rate=0.001,tau=1e-08]
+- Scaffold[batch_size=32,learning_rate=0.01,num_updates=100,server_learning_rate=1.0]
