@@ -107,7 +107,7 @@ class FLambyDataset(BaseDataset):
             self.pooled_train_dataset = self.fed_dataset(train=True, pooled=True)
             self.pooled_test_dataset = self.fed_dataset(train=False, pooled=True)
 
-        except ValueError:
+        except (ValueError, FileNotFoundError, OSError):
             # so that the CI can run wo downloading any dataset
             return dict(
             train_datasets=[],
