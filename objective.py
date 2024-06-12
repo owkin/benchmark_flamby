@@ -44,6 +44,9 @@ class Objective(BaseObjective):
     # Name to select the objective in the CLI and to display the results.
     name = "FLamby"
 
+    # Create a link in the result files from https://benchopt.github.io/results
+    url = "https://github.com/owkin/benchmark_flamby"
+
     # Make it easy to install the benchmark
     install_cmd = "conda"
     requirements = [
