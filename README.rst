@@ -13,9 +13,7 @@ This benchmark is dedicated to tuning cross-silo FL strategies on Flamby_'s data
 The goal is to maximize the average metric across clients using each provided model
 on the val/test clients:
 
-.. math::
-
-    `$\max_{\theta} \sum_{k=0}^{K} m(f_{\theta}(X_{k}), y_{k})$`
+$$\\max_{\\theta} \\sum_{k=0}^{K} m(f_{\\theta}(X_{k}), y_{k})$$
 
 
 where $K$ stands for the number of clients participating in the
